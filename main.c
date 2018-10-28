@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "scanner.h"
+// #include "scanner.h"
 
 int main(){
-  getToken();
+  // getToken();
   return 0;
 }
