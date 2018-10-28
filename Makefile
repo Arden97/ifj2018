@@ -11,10 +11,10 @@ SRCS = list.c \
 
 OBJS = $(SRCS:.c=.o)
 
-# TEST_SRC = $(shell find src/*.c test/*.c | sed '/ifj/d')
-# TEST_OBJ = ${TEST_SRC:.c=.o}
+TEST_SRC = $(shell find *.c test/*.c | sed '/rb/d')
+TEST_OBJ = ${TEST_SRC:.c=.o}
 
-OUT = main
+OUT = ifj18
 
 
 $(OUT): $(OBJ)
@@ -31,5 +31,7 @@ test: test_runner
 test_runner: $(TEST_OBJ)
 	$(CC) $^ $(LDFLAGS) -o $@
 
+clean:
+	rm -f $(OUT) test_runner $(OBJ) $(TEST_OBJ)
 
 .PHONY: test
