@@ -1,39 +1,41 @@
 #include "error.h"
 
 void error_msg(int error_code, char *details){
+  char *err_msg;
   switch(error_code){
     case LEXICAL_ERROR:
-      fprintf(stderr, "%s: %s\n", "Lexical error", details);
+      err_msg = "Lexical error";
       break;
 
     case SYNTAX_ERROR:
-      fprintf(stderr, "%s: %s\n", "Syntax error", details);
+      err_msg = "Syntax error";
       break;
 
     case DEFINITION_ERROR:
-      fprintf(stderr, "%s: %s\n", "Undefined/redefined function/variable", details);
+      err_msg = "Undefined/redefined function/variable";
       break;
 
     case TYPE_ERROR:
-      fprintf(stderr, "%s: %s\n", "Type compatibility error", details);
+      err_msg = "Type compatibility error";
       break;
 
     case ARGS_ERROR:
-      fprintf(stderr, "%s: %s\n", "Wrong number of arguments", details);
+      err_msg = "Wrong number of arguments";
       break;
 
     case SEMANTIC_ERROR:
-      fprintf(stderr, "%s: %s\n", "Semantic error", details);
+      err_msg = "Semantic error";
       break;
 
     case DIVBYZERO_ERROR:
-      fprintf(stderr, "%s: %s\n", "Attempting to divide by zero", details);
+      err_msg = "Attempting to divide by zero";
       break;
 
     case INTER_ERROR:
-      fprintf(stderr, "%s: %s\n", "Internal error of compiler", details);
+      err_msg = "Internal error of compiler";
       break;
   }
+  fprintf(stderr, "%s:  %s", err_msg, details);
   /// clear_all() clear all allocated memory
   /// free(ptr) clear memory for pointer of dll
 }
