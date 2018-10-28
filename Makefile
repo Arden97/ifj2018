@@ -1,18 +1,35 @@
-CC=gcc
-CFLAGS= -Wall -Wextra -std=c99 -pedantic -lm -I.
-DEPS = scanner.c scanner.h strlib.h strlib.c main.c
-OBJ = scanner.o strlib.o main.o
+CC ?= gcc
+PREFIX ?= /usr/local
 
-%.o: %.c $(DEPS)
-	$(CC) -g -c -o $@ $< $(CFLAGS)
+CFLAGS = -O3 -std=c99 -Wall -Wextra -Ideps -pedantic
+LDFLAGS += -lm
 
-ifj2018: $(OBJ)
-	gcc -g -o $@ $^ $(CFLAGS)
+SRCS = list.c \
+	   list_node.c \
+	   list_iterator.c \
+	   main.c
 
-clean:
-	rm -f *.o ifj2018
+OBJS = $(SRCS:.c=.o)
 
-.PHONY:test
+# TEST_SRC = $(shell find src/*.c test/*.c | sed '/ifj/d')
+# TEST_OBJ = ${TEST_SRC:.c=.o}
 
-test:
-	./tests/tttest
+OUT = main
+
+
+$(OUT): $(OBJ)
+	$(CC) $^ $(SRCS) $(CFLAGS) -o $@
+
+
+%.o: %.c
+	@$(CC) -c $(CFLAGS) $< -o $@
+
+
+test: test_runner
+	@./$<
+
+test_runner: $(TEST_OBJ)
+	$(CC) $^ $(LDFLAGS) -o $@
+
+
+.PHONY: test
