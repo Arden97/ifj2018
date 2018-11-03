@@ -25,8 +25,6 @@ void *gc_malloc(size_t size) {
         error(INTERNAL_ERROR, "Memory allocation failed");
     }
 
-    error(INTERNAL_ERROR, "LOLDO!");
-
     gc_append(ptr);    //if failed, exits in gc_append func
     return ptr;
 }
