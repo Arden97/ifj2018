@@ -5,8 +5,7 @@ CFLAGS = -O3 -std=c99 -Wall -Wextra -Ideps -pedantic
 LDFLAGS += -lm
 
 SRCS = list.c \
-	   list_node.c \
-	   list_iterator.c \
+       gc.c \
 	   main.c
 
 OBJS = $(SRCS:.c=.o)
