@@ -1,4 +1,5 @@
 #include "error.h"
+#include "gc.h"
 
 void error_msg(int error_code, char *details){
   char *err_msg;
@@ -31,11 +32,15 @@ void error_msg(int error_code, char *details){
       err_msg = "Attempting to divide by zero";
       break;
 
-    case INTER_ERROR:
+    case INTERNAL_ERROR:
       err_msg = "Internal error of compiler";
       break;
   }
-  fprintf(stderr, "%s:  %s", err_msg, details);
-  /// clear_all() clear all allocated memory
-  /// free(ptr) clear memory for pointer of dll
+  fprintf(stderr, "%s. Message:  %s\n", err_msg, details);
+}
+
+void error(int error_code, char *details){
+  error_msg(error_code, details);
+  gc_dispose();
+  exit(error_code);
 }
