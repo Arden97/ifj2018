@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "gc.h"
-
+#include "error.h"
 
 void *find(void *ptr) {
 
@@ -21,9 +21,11 @@ void *gc_malloc(size_t size) {
     void *ptr = malloc(size);
     if (ptr == NULL) {
         gc_dispose();      //free all
-        fprintf(stderr, "INTERNAL ERROR: malloc failed");
-        exit(99);
+
+        error(INTERNAL_ERROR, "Memory allocation failed");
     }
+
+    error(INTERNAL_ERROR, "LOLDO!");
 
     gc_append(ptr);    //if failed, exits in gc_append func
     return ptr;
@@ -39,8 +41,8 @@ void *gc_realloc(void *ptr, size_t size) {
         // but it won't be freed, cause, it is maybe already freed by realloc
         gc_delete(find(tmp));
         gc_dispose();      //free all
-        fprintf(stderr, "INTERNAL ERROR: malloc failed");
-        exit(99);
+        error(INTERNAL_ERROR, "Memory allocation failed");
+
     }
     if (ptr != tmp) {
         if (tmp != NULL) { gc_delete(find(tmp)); }  //remove and free from log
@@ -96,8 +98,8 @@ void gc_append(void *val) {
 
     if (result == NULL) {
         gc_dispose();      //free all
-        fprintf(stderr, "INTERNAL ERROR: malloc failed");
-        exit(99);
+        error(INTERNAL_ERROR, "Memory allocation failed");
+
     } else {
 
         result->val = val;

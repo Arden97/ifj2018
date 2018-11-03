@@ -18,6 +18,5 @@ void init_list(tList *L) {
 }
 
 void print_list(tList *L){
-    *tListElementPtr item = *L->First;
-    while((item = item->rptr))
+
 }

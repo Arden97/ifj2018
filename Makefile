@@ -6,6 +6,7 @@ LDFLAGS += -lm
 
 SRCS = list.c \
        gc.c \
+       error.c \
 	   main.c
 
 OBJS = $(SRCS:.c=.o)
