@@ -1,11 +1,19 @@
-language: c
 
-os:
-  - linux
-  - osx
+sudo: required
 
-compiler:
-  - clang
-  - gcc
+services:
+- docker
 
-script: make
+language: python
+
+python:
+- "3.6"
+
+script:
+- make
+- pip install -r test/test_requirements.txt
+- python -m pytest -v test/unit_tests
+
+after_success:
+- sh .travis/deploy_dockerhub.sh
+- test “$TRAVIS_BRANCH” = “master” && sh .travis/deploy_heroku.sh

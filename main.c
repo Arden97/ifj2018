@@ -5,7 +5,7 @@
 
 tList *adata = NULL;
 
-
+§
 int main() {
     if((adata= malloc(sizeof(tList))) == NULL){
         printf("Malloc garbage collector\n");
