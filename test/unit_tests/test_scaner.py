@@ -8,7 +8,7 @@ rules = json.loads(open('test/unit_tests/parser_data.json', 'rb').read())
 parameters = []
 
 for x in rules:
-    output = run(['./ifj18'], stdout=PIPE, input=x['input'], encoding='utf-8')
+    output = run(['/code/ifj18'], stdout=PIPE, input=x['input'], encoding='utf-8')
 
     parameters.append(pytest.param(output.stdout, x))
 
