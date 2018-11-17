@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include "../scanner.h"
 
 char *print_buf;
 
@@ -18,7 +19,7 @@ int bprintf(const char *format, ...) {
  * Test parser.
  */
 
-static void _test_scanner(const char *source_path, const char *out_path) {
+static void _test_parser(const char *source_path, const char *out_path) {
   // init parser here
 
   char *source = file_read(source_path);
@@ -35,9 +36,19 @@ static void _test_scanner(const char *source_path, const char *out_path) {
   assert(strcmp(expected, print_buf) == 0);
 }
 
-static void test_assign() {
-  _test_scanner("test/scanner/assign.rb", "test/scanner/assign.out");
+static void _test_scanner(const char *source_path) {
+  ifj18_token_t *token = getToken();
+  stdin = fopen(source_path, "r");
+  token_prettyprint(token);
 }
+
+static void test_def() {
+  _test_scanner("test/scanner/def.rb");
+}
+
+// static void test_assign() {
+//   _test_scanner("test/scanner/assign.rb", "test/scanner/assign.out");
+// }
 
 /*
  * Test the given `fn`.
@@ -60,21 +71,21 @@ static void test_assign() {
 #define size(type)                                                             \
   printf("\n  \e[90m%s: %ld bytes\e[0m\n", #type, sizeof(type));
 
-/*
- * Run all test suites.
- */
+// /*
+//  * Run all test suites.
+//  */
 
-int main(int argc, const char **argv) {
-  clock_t start = clock();
+// int main(int argc, const char **argv) {
+//   clock_t start = clock();
 
-  // size(some ifj18 obj);
+//   // size(some ifj18 obj);
 
-  suite("parser");
-  // test(assign);
+//   suite("scanner");
+//   test(def);
 
-  printf("\n");
-  printf("  \e[90mcompleted in \e[32m%.5fs\e[0m\n",
-         (float)(clock() - start) / CLOCKS_PER_SEC);
-  printf("\n");
-  return 0;
-}
+//   printf("\n");
+//   printf("  \e[90mcompleted in \e[32m%.5fs\e[0m\n",
+//          (float)(clock() - start) / CLOCKS_PER_SEC);
+//   printf("\n");
+//   return 0;
+// }
