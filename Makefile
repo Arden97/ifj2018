@@ -1,29 +1,35 @@
-CC ?= gcc
-PREFIX ?= /usr/local
+SRC=$(wildcard *.c)
+OBJ=${SRC:.c=.o}
 
-CFLAGS = -O3 -std=c99 -Wall -Wextra -Ideps -pedantic
-LDFLAGS += -lm
+CC=clang
+PREFIX=/usr/local
+CFLAGS=-std=c99 -g -O0 -Wno-parentheses -Wno-switch-enum -Wno-unused-value
+CFLAGS+=-Wno-switch
+CFLAGS+=-I deps
+LDFLAGS+=-lm
 
 SRCS = list.c \
        gc.c \
        error.c \
 	   main.c
 
-OBJS = $(SRCS:.c=.o)
 
-TEST_SRC = $(shell find *.c test/*.c | sed '/rb/d')
-TEST_OBJ = ${TEST_SRC:.c=.o}
+# test
+TEST_SRC=$(shell find *.c test/*.c | sed '/ifj18/d')
+TEST_OBJ=${TEST_SRC:.c=.o}
 
-OUT = ifj18
+CFLAGS+=-I src
 
+# output
+
+OUT=ifj18
 
 $(OUT): $(OBJ)
-	$(CC) $^ $(SRCS) $(CFLAGS) -o $@
-
+	$(CC) $^ $(LDFLAGS) -o $@
 
 %.o: %.c
 	@$(CC) -c $(CFLAGS) $< -o $@
-
+	@printf "\e[36mCC\e[90m %s\e[0m\n" $@
 
 test: test_runner
 	@./$<
@@ -31,7 +37,13 @@ test: test_runner
 test_runner: $(TEST_OBJ)
 	$(CC) $^ $(LDFLAGS) -o $@
 
-clean:
-	rm -f $(OUT) test_runner $(OBJ) $(TEST_OBJ)
+install: ifj18
+	install ifj18 $(PREFIX)/bin
 
-.PHONY: test
+uninstall:
+	rm $(PREFIX)/bin/ifj18
+
+clean:
+	rm -f ifj18 test_runner $(OBJ) $(TEST_OBJ)
+
+.PHONY: clean test install uninstall

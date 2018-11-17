@@ -1,29 +1,40 @@
-#define STR_INIT 128
+#ifndef IFJ_STR_H
 
-/**
- * @brief      this structure represents string with metadata
- */
-typedef struct string_t{
-	char * string;		///< string allocated on heap
-	size_t capacity; 	///< allocated space for string
-	size_t length;		///< actual length of string
-}string_t;
+#define IFJ_STR_H
+#define MAX_STRING_SIZE 200
 
-/**
- * @brief      Function initializes string structure
- *
- * @param[in]  size  Size of usable space
- *
- * @return     Pointer to initialized string structure
- */
-string_t *strInit(size_t size);
+#include "error.h"
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 
-/**
- * @brief      Function to extend string
- *
- * @param      str       Pointer to string structure
- * @param[in]  new_size  New size of usable space
- *
- * @return     Pointer to string structure with extended string
- */
-bool extendStr(string_t *str, size_t new_size);
+typedef struct {
+    int length;
+    int mem_alloc;
+    char *value;
+} string;
+
+int string_init(string *str);
+
+
+void string_free(string *str);
+
+void string_reset(string *str);
+
+
+int string_append(string *str, char sym);
+
+int string_compare(string *str1, string *str2);
+
+int string_compare_literal(string *str1, char *str2);
+
+int string_in_list(string *substr, char **strings, int strings_length);
+
+int string_copy_literal(string *str1, char *str2);
+
+int string_copy(string *str1, string *str2);
+
+void string_print(string *str);
+
+#endif
