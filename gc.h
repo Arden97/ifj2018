@@ -3,6 +3,7 @@
 #define ifj_GC
 
 #include "list.h"
+#include <stddef.h>
 
 extern tList *adata;
 
