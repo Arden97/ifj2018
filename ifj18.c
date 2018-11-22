@@ -1,35 +1,19 @@
+#include "gc.h"
+#include "semantics.h"
+#include "symtable.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "gc.h"
-
 
 tList *adata = NULL;
 
-
 int main() {
-    if((adata= malloc(sizeof(tList))) == NULL){
-        printf("Malloc garbage collector\n");
-        return 1;
-    }
-    init_list(adata);
+  ifj18_obj_t *tmp = init_var();
 
-    int *ptr_one;
+  // tmp->obj_type.func.return_var->value.as_int = 42;
+  // tmp->obj_type.func.local_symtable = ifj18_hash_new();
 
-    ptr_one = (int *)gc_malloc(sizeof(int));
+  ifj18_hash_set(tmp->obj_type.func.local_symtable, "foo", tmp);
 
-    if (ptr_one == 0)
-    {
-        printf("ERROR: Out of memory\n");
-        return 1;
-    }
-
-    *ptr_one = 25;
-    printf("%d\n", *ptr_one);
-
-    gc_dispose();
-
-    printf("%d\n", *ptr_one);
-
-
-    return 0;
+  printf("%d\n", tmp->obj_type.func.return_var->value.as_int);
+  printf("%d\n", ifj18_hash_has(tmp->obj_type.func.local_symtable, "ooo"));
 }
