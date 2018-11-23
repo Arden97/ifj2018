@@ -30,8 +30,8 @@ typedef khash_t(value) ifj18_hash_t;
 
 #define ifj18_hash_size kh_size
 
-
-void ifj18_hash_set(khash_t(value) * self, char *key, ifj18_obj_t *val);
+    void
+    ifj18_hash_set(khash_t(value) * self, char *key, ifj18_obj_t *val);
 
 ifj18_obj_t *ifj18_hash_get(khash_t(value) * self, char *key);
 

@@ -2,6 +2,7 @@
 #define IFJ18_SEMANTICS_H
 
 #include "strlib.h"
+#include "symtable.h"
 
 typedef enum {
   IFJ18_TYPE_NULL,
@@ -36,4 +37,5 @@ typedef struct ifj18_obj_t {
 ifj18_obj_t *init_var();
 ifj18_obj_t *init_func();
 
+ifj18_hash_t *global_table;
 #endif

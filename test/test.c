@@ -37,7 +37,7 @@ static void _test_parser(const char *source_path, const char *out_path) {
 }
 
 static void _test_scanner(const char *source_path) {
-  ifj18_token_t *token = getToken();
+  ifj18_token_t *token = get_token();
   stdin = fopen(source_path, "r");
   token_prettyprint(token);
 }
