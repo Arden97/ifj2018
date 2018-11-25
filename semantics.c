@@ -22,7 +22,6 @@ ifj18_obj_t *init_func() {
     // todo: add error
   }
   func->return_var = var;
-  func->return_type = IFJ18_TYPE_NULL;
 
   ifj18_obj_t *obj_func = (ifj18_obj_t *)malloc(sizeof(ifj18_obj_t));
   obj_func->obj_type.func = *func;

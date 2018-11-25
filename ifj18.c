@@ -3,17 +3,19 @@
 #include "symtable.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "scanner.h"
+#include "prettyprint.h"
 
 tList *adata = NULL;
 
 int main() {
   ifj18_obj_t *tmp = init_var();
+  global_table = ifj18_hash_new();
 
-  // tmp->obj_type.func.return_var->value.as_int = 42;
-  // tmp->obj_type.func.local_symtable = ifj18_hash_new();
+  tmp->obj_type.var.value.as_int = 42;
 
-  ifj18_hash_set(tmp->obj_type.func.local_symtable, "foo", tmp);
+  ifj18_hash_set(global_table, "foo", tmp);
 
-  printf("%d\n", tmp->obj_type.func.return_var->value.as_int);
-  printf("%d\n", ifj18_hash_has(tmp->obj_type.func.local_symtable, "ooo"));
+  printf("%d\n", tmp->obj_type.var.value.as_int);
+  printf("%d\n", ifj18_hash_has(global_table, "ooo"));
 }
