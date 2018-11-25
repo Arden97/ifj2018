@@ -36,7 +36,9 @@ void error_msg(int error_code, char *details){
       err_msg = "Internal error of compiler";
       break;
   }
-  fprintf(stderr, "%s. Message:  %s\n", err_msg, details);
+  fprintf(stderr,RESET);
+  printf(RESET);
+  fprintf(stderr, "%s%s. Message:  %s\n%s", KRED,err_msg, details,RESET);
 }
 
 void error(int error_code, char *details){

@@ -8,11 +8,6 @@ CFLAGS+=-Wno-switch
 CFLAGS+=-I deps
 LDFLAGS+=-lm
 
-SRCS = list.c \
-       gc.c \
-       error.c \
-	   main.c
-
 
 # test
 TEST_SRC=$(shell find *.c test/*.c | sed '/ifj18/d')

@@ -9,7 +9,7 @@
 #include "strlib.h"
 
 
-ifj18_token_t *token;
+
 
 void init_token() {
   token = malloc(sizeof(ifj18_token_t));
@@ -227,6 +227,7 @@ ifj18_token_t *getToken() {
     case '-': return save_token(TOKEN_OP_MINUS);
     case '*': return save_token(TOKEN_OP_MUL);
     case '/': return save_token(TOKEN_OP_DIV);
+    case -1: return save_token(TOKEN_END_OF_FILE);
     case '!': return '=' == (c = fgetc(stdin)) ? save_token(TOKEN_OP_NEQ) : (ungetc(c, stdin), save_token(TOKEN_OP_NOT));
     case '=': return '=' == (c = fgetc(stdin)) ? save_token(TOKEN_OP_EQ) : (ungetc(c, stdin), save_token(TOKEN_OP_ASSIGN));
     case '&':
