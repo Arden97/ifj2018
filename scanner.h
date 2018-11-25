@@ -4,6 +4,8 @@
 #include <assert.h>
 #include "strlib.h"
 
+
+
 #define IFJ18_TOKEN_LIST \
   t(DEF, "def") \
 	t(DO, "do") \
@@ -30,8 +32,8 @@
 	t(INT, "int") \
 	t(FLOAT, "float") \
 	t(STRING, "string") \
-	t(END_OF_FILE, "eof") \
-	t(END_OF_LINE, "eol") \
+	t(END_OF_FILE, -1) \
+	t(END_OF_LINE, 10) \
 	t(LENGTH, "length") \
   t(LPAREN, "(") \
   t(RPAREN, ")") \
