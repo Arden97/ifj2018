@@ -92,6 +92,5 @@ static inline const char *ifj18_token_type_string(ifj18_token type) {
 }
 
 ifj18_token_t *getToken();
-
 ifj18_token_t *token;
 #endif /* IFJ18_TOKEN_H */

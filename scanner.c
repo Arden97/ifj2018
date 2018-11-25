@@ -8,9 +8,6 @@
 #include <math.h>
 #include "strlib.h"
 
-
-
-
 void init_token() {
   token = malloc(sizeof(ifj18_token_t));
   token->value = malloc(sizeof(t_token_value));
@@ -210,7 +207,7 @@ static ifj18_token_t *scan_number(int c) {
   }
 }
 
-ifj18_token_t *getToken() {
+ifj18_token_t *get_token() {
   init_token();
   int c;
 

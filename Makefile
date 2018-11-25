@@ -5,9 +5,7 @@ CC=clang
 PREFIX=/usr/local
 CFLAGS=-std=c99 -g -O0 -Wno-parentheses -Wno-switch-enum -Wno-unused-value
 CFLAGS+=-Wno-switch
-CFLAGS+=-I deps
 LDFLAGS+=-lm
-
 
 # test
 TEST_SRC=$(shell find *.c test/*.c | sed '/ifj18/d')

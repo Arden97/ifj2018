@@ -3,16 +3,13 @@
 
 #include "gc.h"
 #include "semantics.h"
-#include "symtable.h"
 #include "scanner.h"
 #include "prettyprint.h"
-
 
 tList *adata = NULL;
 
 
 int main() {
-
     getToken();
     int counter = 0;
 
@@ -61,7 +58,4 @@ int main() {
 //
 //  printf("%d\n", tmp->obj_type.func.return_var->value.as_int);
 //  printf("%d\n", ifj18_hash_has(tmp->obj_type.func.local_symtable, "ooo"));
-
-
-
 }
