@@ -6,12 +6,19 @@
 
 int PROG();
 int DEFINE_FUNCTION();
-int STATEMENT_LIST();
+int STATEMENT_LIST(ifj18_obj_t *func);
 int STATEMENT();
-int ELSE_BRANCH();
 int CALL_ASIGN();
 int PARAM_LIST(ifj18_obj_t *func);
 int NEXT_PARAM();
+int parse_id();
+int parse_if();
+int parse_while();
+int parse_print();
+int parse_inputf();
+int parse_inputs();
+int parse_inputi();
+int expression();
 
 int PROG() {
   switch (token->type) {
@@ -76,11 +83,105 @@ int DEFINE_FUNCTION() {
       error(SEMANTIC_ERROR, "id already defined");
     }
 
+    ifj18_hash_set(global_table, token->value->as_string, func);
+
     get_token();
 
-    if (PARAM_LIST(func)) {
+    if (token->type == TOKEN_LPAREN) {
+      if (PARAM_LIST(func)) {
+        get_token();
+        char *type;
+
+        if (token->type == TOKEN_END_OF_LINE) {
+          get_token();
+          if (STATEMENT_LIST(func)) {
+            switch (func->obj_type.func.return_var->type) {
+            case IFJ18_TYPE_INT:
+              type = "int@0";
+              break;
+            case IFJ18_TYPE_STRING:
+              type = "string@";
+              break;
+            case IFJ18_TYPE_FLOAT:
+              type = "float@0.0";
+              break;
+            }
+            printf("PUSHS %s\n \
+                  POPFRAME\n \
+                  RETURN\n",
+                   type);
+          }
+        }
+      }
     }
   }
+}
 
-  ifj18_hash_set(global_table, token->value->as_string, func);
+int STATEMENT_LIST(ifj18_obj_t *func) {
+  switch (token->type) {
+  case TOKEN_END_OF_LINE:
+    get_token();
+    return STATEMENT_LIST(func);
+  case TOKEN_END:
+    get_token();
+    return 1;
+  case TOKEN_ID:
+  case TOKEN_IF:
+  case TOKEN_WHILE:
+  case TOKEN_PRINT:
+  case TOKEN_INPUTF:
+  case TOKEN_INPUTS:
+  case TOKEN_INPUTI:
+    STATEMENT();
+    return STATEMENT_LIST(func);
+  default:
+    return 0;
+    break;
+  }
+}
+
+int STATEMENT() {
+  switch (token->type) {
+  case TOKEN_END_OF_LINE:
+    return 1;
+  case TOKEN_ID:
+    // return parse_id();
+  case TOKEN_IF:
+    // return parse_if();
+  case TOKEN_WHILE:
+    // return parse_while();
+  case TOKEN_PRINT:
+    // return parse_print();
+  case TOKEN_INPUTF:
+    // return parse_inputf();
+  case TOKEN_INPUTS:
+    // return parse_inputs();
+  case TOKEN_INPUTI:
+    // return parse_inputi();
+  default:
+    return 0;
+  }
+}
+
+int PARAM_LIST(ifj18_obj_t *func) {
+  get_token();
+
+  if (token->type == TOKEN_COMMA) {
+    return 0;
+  }
+
+  if (token->type == TOKEN_RPAREN) {
+    return 1;
+  }
+
+  if (token->type != TOKEN_COMMA) {
+    // if (!expression())
+    //   return 0;
+  }
+
+  if (token->type == TOKEN_COMMA) {
+    return PARAM_LIST(func);
+  }
+
+  return 0;
 }
