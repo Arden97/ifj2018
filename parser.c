@@ -180,6 +180,7 @@ int PARAM_LIST(ifj18_obj_t *func) {
   }
 
   if (token->type == TOKEN_COMMA) {
+    func->obj_type.func.params_num++;
     return PARAM_LIST(func);
   }
 

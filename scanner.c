@@ -60,6 +60,8 @@ static ifj18_token_t *scan_ident(int c) {
     case 3:
       if (0 == strcmp("def", buf)) return save_token(TOKEN_DEF);
       if (0 == strcmp("end", buf)) return save_token(TOKEN_END);
+      if (0 == strcmp("chr", buf)) return save_token(TOKEN_CHR);
+      if (0 == strcmp("ord", buf)) return save_token(TOKEN_ORD);
       break;
     case 4:
       if (0 == strcmp("else", buf)) return save_token(TOKEN_ELSE);
@@ -67,7 +69,14 @@ static ifj18_token_t *scan_ident(int c) {
       break;
     case 5:
       if (0 == strcmp("while", buf)) return save_token(TOKEN_WHILE);
+      if (0 == strcmp("print", buf)) return save_token(TOKEN_PRINT);
       break;
+    case 6:
+      if (0 == strcmp("inputs", buf)) return save_token(TOKEN_INPUTS);  
+      if (0 == strcmp("inputf", buf)) return save_token(TOKEN_INPUTF);
+      if (0 == strcmp("inputi", buf)) return save_token(TOKEN_INPUTI);
+      if (0 == strcmp("length", buf)) return save_token(TOKEN_LENGTH);
+      if (0 == strcmp("substr", buf)) return save_token(TOKEN_SUBSTR);
   }
 
   string_copy_literal(token->value->as_string, buf);

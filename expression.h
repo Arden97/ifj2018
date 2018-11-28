@@ -1,0 +1,5 @@
+#include "symtable.h"
+#include "semantics.h"
+#include "scanner.h"
+#include "strlib.h"
+#include "error.h"
