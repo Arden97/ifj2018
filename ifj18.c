@@ -8,8 +8,13 @@
 
 tList *adata = NULL;
 
-
 int main() {
+    print_length();
+    print_length();
+    print_length();
+    print_length();
+    print_length();
+
   // ifj18_obj_t *tmp = init_var();
   // global_table = ifj18_hash_new();
 

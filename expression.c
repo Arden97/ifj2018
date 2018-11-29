@@ -22,6 +22,16 @@ char precedence_table[17][17] = {
     {/* CM | , |*/ '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '=', '<', '<', '=', '#'},
     {/* END| $ |*/ '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '#', '<', '<', '#', '\0'},
 };
+char flags[4] = {0,0,0,0};
+#define FG_LENGTH 0
+#define FG_INPUTI 1
+#define FG_INPUTF 2
+#define FG_INPUTS 3
+
+
+
+
+
 
 int expression(ifj18_obj_t *func) {
   if (is_function())
@@ -114,10 +124,7 @@ int length() {
 
   check_arg(TOKEN_STRING, 1);
 
-  printf("PUSHS %s\n \
-          CREATEFRAME\n \
-          PUSHFRAME",
-         token->value->as_string);
+  printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
 }
 
 void check_arg(int required_type, char id_allowed) {
@@ -136,4 +143,12 @@ void check_token_type(int required_type, int error_type, int inv) {
       error(error_type, "");
     }
   }
+}
+
+
+void print_length(){
+  if(!flags[FG_LENGTH] && flags[FG_LENGTH]++){
+    printf("LABEL $_length\nPUSHFRAME\nSTRLEN GF@$_stack_temp LF@$_arg_0\nPUSHS GF@$_stack_temp\nPOPFRAME\nRETURN\n\n");
+  }
+  printf("%d", flags[FG_LENGTH]);
 }
