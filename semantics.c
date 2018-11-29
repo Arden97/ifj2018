@@ -1,5 +1,6 @@
 #include "semantics.h"
 #include "symtable.h"
+#include "strlib.h"
 
 ifj18_obj_t *init_var() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
@@ -17,11 +18,17 @@ ifj18_obj_t *init_var() {
 
 ifj18_obj_t *init_func() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
-
+  if (var == NULL) {
+    // todo: add error
+  }
   ifj18_func_t *func = (ifj18_func_t *)malloc(sizeof(ifj18_func_t));
   if (func == NULL) {
     // todo: add error
   }
+
+  string *params;
+  string_init(params);
+  func->sparams = params;
   func->return_var = var;
   func->params_num = 0;
 

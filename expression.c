@@ -51,7 +51,34 @@ int is_function() {
 }
 
 int function(ifj18_obj_t *act_function) {
-  ifj18_obj_t *func = ifj18_hash_get(global_table, token->value->as_string);
+  switch (token->type) {
+    case TOKEN_INPUTF:
+      return inputf();
+    break;
+
+    case TOKEN_INPUTI:
+      return inputi();
+    break;
+
+    case TOKEN_INPUTS:
+      return inputs();
+    break;
+
+    case TOKEN_LENGTH:
+      return length();
+    break;
+
+    case TOKEN_SUBSTR:
+      return substr();
+    break;
+
+    case TOKEN_ORD:
+      return ord();
+    break;
+  }
+
+  char *key = token->value->as_string;
+  ifj18_obj_t *func = ifj18_hash_get(global_table, key);
   int params_num = func->obj_type.func.params_num;
 
   get_token();
@@ -65,8 +92,18 @@ int function(ifj18_obj_t *act_function) {
   }
 
   for (int i = 0; i < params_num; i++) {
-    // TODO check parametr type
+    printf("PUSHS %s\n", func->obj_type.func.sparams[i]->value);
+    get_token();
+    if ((i != params_num-1) && (token->type != TOKEN_COMMA)){
+      return 0;
+    }
   }
+  get_token();
+  if(token->type != TOKEN_RPAREN){
+    return 0;
+  }
+  printf("CALL %s\n", key);
+
 }
 
 int length() { ifj18_obj_t *func = init_func(); }
