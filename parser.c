@@ -145,19 +145,11 @@ int STATEMENT() {
   case TOKEN_END_OF_LINE:
     return 1;
   case TOKEN_ID:
-    // return parse_id();
+    return expression();
   case TOKEN_IF:
-    // return parse_if();
   case TOKEN_WHILE:
-    // return parse_while();
   case TOKEN_PRINT:
-    // return parse_print();
-  case TOKEN_INPUTF:
-    // return parse_inputf();
-  case TOKEN_INPUTS:
-    // return parse_inputs();
-  case TOKEN_INPUTI:
-    // return parse_inputi();
+    return 0;
   default:
     return 0;
   }
