@@ -5,18 +5,14 @@
 #include "semantics.h"
 #include "scanner.h"
 #include "prettyprint.h"
+#include "parser.h"
+
 
 tList *adata = NULL;
 
 int main() {
-    print_length();
-    print_length();
-    print_length();
-    print_length();
-    print_length();
-
   // ifj18_obj_t *tmp = init_var();
-  // global_table = ifj18_hash_new();
+  global_table = ifj18_hash_new();
 
   // tmp->obj_type.var.value.as_int = 42;
 
@@ -24,4 +20,7 @@ int main() {
 
   // printf("%d\n", tmp->obj_type.var.value.as_int);
   // printf("%d\n", ifj18_hash_has(global_table, "ooo"));
+
+  get_token();
+  PROG();
 }

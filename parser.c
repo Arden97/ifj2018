@@ -1,26 +1,8 @@
-#include "scanner.h"
-#include "semantics.h"
-#include "stdlib.h"
-#include "symtable.h"
-#include <stdio.h>
-
-int PROG();
-int DEFINE_FUNCTION();
-int STATEMENT_LIST(ifj18_obj_t *func);
-int STATEMENT();
-int CALL_ASIGN();
-int PARAM_LIST(ifj18_obj_t *func);
-int NEXT_PARAM();
-int parse_id();
-int parse_if();
-int parse_while();
-int parse_print();
-int parse_inputf();
-int parse_inputs();
-int parse_inputi();
-int expression();
+#include "parser.h"
 
 int PROG() {
+  ifj18_obj_t *main_func = init_func();
+
   switch (token->type) {
   case TOKEN_DEF:
     if (DEFINE_FUNCTION()) {
@@ -34,7 +16,7 @@ int PROG() {
     get_token();
     return PROG();
   case TOKEN_IF:
-    if (STATEMENT()) {
+    if (STATEMENT(main_func)) {
       if (token->type == TOKEN_THEN) {
         get_token();
         if (token->type == TOKEN_END_OF_LINE) {
@@ -45,7 +27,7 @@ int PROG() {
     }
     break;
   case TOKEN_ID:
-    if (STATEMENT()) {
+    if (STATEMENT(main_func)) {
       if (token->type == TOKEN_END_OF_LINE) {
         get_token();
         return PROG();
@@ -53,7 +35,7 @@ int PROG() {
     }
     break;
   case TOKEN_WHILE:
-    if (STATEMENT()) {
+    if (STATEMENT(main_func)) {
       if (token->type == TOKEN_END_OF_LINE) {
         get_token();
         return PROG();
@@ -132,7 +114,7 @@ int STATEMENT_LIST(ifj18_obj_t *func) {
   case TOKEN_INPUTF:
   case TOKEN_INPUTS:
   case TOKEN_INPUTI:
-    STATEMENT();
+    STATEMENT(func);
     return STATEMENT_LIST(func);
   default:
     return 0;
@@ -140,12 +122,15 @@ int STATEMENT_LIST(ifj18_obj_t *func) {
   }
 }
 
-int STATEMENT() {
+int STATEMENT(ifj18_obj_t *func) {
   switch (token->type) {
   case TOKEN_END_OF_LINE:
     return 1;
   case TOKEN_ID:
-    return expression();
+    get_token();
+    if (token->type == TOKEN_OP_ASSIGN) {
+      return expression(func);
+    }
   case TOKEN_IF:
   case TOKEN_WHILE:
   case TOKEN_PRINT:

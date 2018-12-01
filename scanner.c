@@ -260,6 +260,7 @@ ifj18_token_t *get_token() {
       while ((c = fgetc(stdin)) != '\n' && c) ; ungetc(c, stdin);
       goto scan;
     case '\n':
+      save_token(TOKEN_END_OF_LINE);
     case '\r':
       goto scan;
     case '"':
