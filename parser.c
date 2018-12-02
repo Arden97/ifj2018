@@ -1,6 +1,9 @@
 #include "parser.h"
 
 int PROG() {
+    printf("CREATEFRAME\n");
+    printf("PUSHFRAME\n");
+    printf("DEFVAR LF@%s\n", FUNC_RETURN_VARNAME);
     printf("# start PROG\n");
     token_prettyprint(token);
     ifj18_obj_t *main_func = init_func();
@@ -60,7 +63,6 @@ int DEFINE_FUNCTION() {
 
 
 
-
 //  if (token->type == TOKEN_ID) {
 //
 //    if (ifj18_hash_has(global_table, token->value->as_string)) {
@@ -114,8 +116,16 @@ int STATEMENT(ifj18_obj_t *func) {
             get_token();
             if (token->type == TOKEN_OP_ASSIGN) {
                 printf("DEF LF@%s\n", token_id_name);
-                return expression(func, "retval");
+//                expression(func, token_id_name);
+                printf("#Sent LF@%s as variable to save expr\n", token_id_name);
+                printf("MOV LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
             }
+            else{
+                expression(func, FUNC_RETURN_VARNAME);
+            }
+
+
+            break;
         case TOKEN_IF:
         case TOKEN_WHILE:
         case TOKEN_PRINT:
