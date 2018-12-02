@@ -1,10 +1,10 @@
 #include "parser.h"
 
 int PROG() {
-    printf("start PROG\n");
+    printf("# start PROG\n");
     token_prettyprint(token);
     ifj18_obj_t *main_func = init_func();
-    printf("init_func() complete\n");
+    printf("# init_func() complete\n");
     switch (token->type) {
         case TOKEN_DEF:
 //    if (DEFINE_FUNCTION()) {
@@ -63,9 +63,9 @@ int PROG() {
 int DEFINE_FUNCTION() {
     char paren_found = 0;
 
-    printf("start define_function()\n");
+    printf("# start define_function()\n");
     ifj18_obj_t *func = init_func();
-    printf("init_func() complete \n");
+    printf("# nit_func() complete \n");
     get_token();
 
     token_prettyprint(token);
@@ -73,7 +73,7 @@ int DEFINE_FUNCTION() {
 
     check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Incorrect token after def");
 
-    printf("Check hash_has\n");
+    printf("# Check hash_has\n");
 
 
     if (ifj18_hash_has(global_table, token->value->as_string->value)) {
@@ -81,7 +81,7 @@ int DEFINE_FUNCTION() {
         error(SEMANTIC_ERROR, "ID has been defined already");
     }
 
-    printf("Set hash funct\n");
+    printf("# Set hash funct\n");
 
     ifj18_hash_set(global_table, token->value->as_string, func);
 
@@ -177,13 +177,13 @@ int STATEMENT(ifj18_obj_t *func) {
 }
 
 void PARAM_LIST(ifj18_obj_t *func, char param_found) {
+    token_prettyprint(token);
     if(!param_found && token->type == TOKEN_RPAREN){
         error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
     }
     else if( (param_found && token->type == TOKEN_RPAREN) || ( !param_found && token->type == TOKEN_END_OF_LINE ) ){
         return;
     }
-    token_prettyprint(token);
 
     check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "function parameter expected to be identifier");
 

@@ -32,8 +32,8 @@
 	t(INT, "int") \
 	t(FLOAT, "float") \
 	t(STRING, "string") \
-	t(END_OF_FILE, -1) \
-	t(END_OF_LINE, 10) \
+	t(END_OF_FILE, "EOF") \
+	t(END_OF_LINE, "EOL") \
 	t(LENGTH, "length") \
   t(LPAREN, "(") \
   t(RPAREN, ")") \
