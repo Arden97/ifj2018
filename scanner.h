@@ -91,6 +91,12 @@ static inline const char *ifj18_token_type_string(ifj18_token type) {
   return ifj18_token_strings[type];
 }
 
-ifj18_token_t *getToken();
+ifj18_token_t *get_token();
 ifj18_token_t *token;
+void check_token_type(int required_type, int error_type, int inv);
+
+void check_arg(int required_type, char id_allowed);
+
+void check_token_type_msg(int required_type, int error_type, int inv, char *message);
+
 #endif /* IFJ18_TOKEN_H */

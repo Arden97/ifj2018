@@ -1,187 +1,207 @@
-#include "scanner.h"
-#include "semantics.h"
-#include "stdlib.h"
-#include "symtable.h"
-#include <stdio.h>
-
-int PROG();
-int DEFINE_FUNCTION();
-int STATEMENT_LIST(ifj18_obj_t *func);
-int STATEMENT();
-int CALL_ASIGN();
-int PARAM_LIST(ifj18_obj_t *func);
-int NEXT_PARAM();
-int parse_id();
-int parse_if();
-int parse_while();
-int parse_print();
-int parse_inputf();
-int parse_inputs();
-int parse_inputi();
-int expression();
+#include "parser.h"
 
 int PROG() {
-  switch (token->type) {
-  case TOKEN_DEF:
-    if (DEFINE_FUNCTION()) {
-      if (token->type == TOKEN_END_OF_LINE) {
-        get_token();
-        return PROG();
-      }
+    printf("start PROG\n");
+    token_prettyprint(token);
+    ifj18_obj_t *main_func = init_func();
+    printf("init_func() complete\n");
+    switch (token->type) {
+        case TOKEN_DEF:
+//    if (DEFINE_FUNCTION()) {
+////      if (token->type == TOKEN_END_OF_LINE) {
+////        get_token();
+////        return PROG();
+////      }
+////    }
+            DEFINE_FUNCTION();
+
+//
+
+
+            break;
+        case TOKEN_END_OF_LINE:
+            get_token();
+            return PROG();
+        case TOKEN_IF:
+            if (STATEMENT(main_func)) {
+                if (token->type == TOKEN_THEN) {
+                    get_token();
+                    if (token->type == TOKEN_END_OF_LINE) {
+                        get_token();
+                        return PROG();
+                    }
+                }
+            }
+            break;
+        case TOKEN_ID:
+            if (STATEMENT(main_func)) {
+                if (token->type == TOKEN_END_OF_LINE) {
+                    get_token();
+                    return PROG();
+                }
+            }
+            break;
+        case TOKEN_WHILE:
+            if (STATEMENT(main_func)) {
+                if (token->type == TOKEN_END_OF_LINE) {
+                    get_token();
+                    return PROG();
+                } else if (token->type == TOKEN_DO) {
+                    get_token();
+                    if (token->type == TOKEN_END_OF_LINE) {
+                        get_token();
+                        return PROG();
+                    }
+                }
+            }
+            break;
+        case TOKEN_END_OF_FILE:
+            return 0;
     }
-    break;
-  case TOKEN_END_OF_LINE:
-    get_token();
-    return PROG();
-  case TOKEN_IF:
-    if (STATEMENT()) {
-      if (token->type == TOKEN_THEN) {
-        get_token();
-        if (token->type == TOKEN_END_OF_LINE) {
-          get_token();
-          return PROG();
-        }
-      }
-    }
-    break;
-  case TOKEN_ID:
-    if (STATEMENT()) {
-      if (token->type == TOKEN_END_OF_LINE) {
-        get_token();
-        return PROG();
-      }
-    }
-    break;
-  case TOKEN_WHILE:
-    if (STATEMENT()) {
-      if (token->type == TOKEN_END_OF_LINE) {
-        get_token();
-        return PROG();
-      } else if (token->type == TOKEN_DO) {
-        get_token();
-        if (token->type == TOKEN_END_OF_LINE) {
-          get_token();
-          return PROG();
-        }
-      }
-    }
-    break;
-  case TOKEN_END_OF_FILE:
-    return 0;
-    break;
-  }
 }
 
 int DEFINE_FUNCTION() {
-  ifj18_obj_t *func = init_func();
+    char paren_found = 0;
 
-  get_token();
+    printf("start define_function()\n");
+    ifj18_obj_t *func = init_func();
+    printf("init_func() complete \n");
+    get_token();
 
-  if (token->type == TOKEN_ID) {
+    token_prettyprint(token);
 
-    if (ifj18_hash_has(global_table, token->value->as_string)) {
-      error(SEMANTIC_ERROR, "id already defined");
+
+    check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Incorrect token after def");
+
+    printf("Check hash_has\n");
+
+
+    if (ifj18_hash_has(global_table, token->value->as_string->value)) {
+        printf("inside of hash_has error\n");
+        error(SEMANTIC_ERROR, "ID has been defined already");
     }
+
+    printf("Set hash funct\n");
 
     ifj18_hash_set(global_table, token->value->as_string, func);
 
+
     get_token();
 
-    if (token->type == TOKEN_LPAREN) {
-      if (PARAM_LIST(func)) {
+    if(token->type == TOKEN_LPAREN){
+        paren_found = 1;
         get_token();
-        char *type;
-
-        if (token->type == TOKEN_END_OF_LINE) {
-          get_token();
-          if (STATEMENT_LIST(func)) {
-            switch (func->obj_type.func.return_var->type) {
-            case IFJ18_TYPE_INT:
-              type = "int@0";
-              break;
-            case IFJ18_TYPE_STRING:
-              type = "string@";
-              break;
-            case IFJ18_TYPE_FLOAT:
-              type = "float@0.0";
-              break;
-            }
-            printf("PUSHS %s\n \
-                  POPFRAME\n \
-                  RETURN\n",
-                   type);
-          }
-        }
-      }
     }
-  }
+
+    PARAM_LIST(func, paren_found);
+
+
+
+
+//  if (token->type == TOKEN_ID) {
+//
+//    if (ifj18_hash_has(global_table, token->value->as_string)) {
+//      error(SEMANTIC_ERROR, "id already defined");
+//    }
+//
+//    ifj18_hash_set(global_table, token->value->as_string, func);
+//
+//    get_token();
+//
+//    if (token->type == TOKEN_LPAREN) {
+//      if (PARAM_LIST(func)) {
+//        get_token();
+//        char *type;
+//
+//        if (token->type == TOKEN_END_OF_LINE) {
+//          get_token();
+//          if (STATEMENT_LIST(func)) {
+//            switch (func->obj_type.func.return_var->type) {
+//            case IFJ18_TYPE_INT:
+//              type = "int@0";
+//              break;
+//            case IFJ18_TYPE_STRING:
+//              type = "string@";
+//              break;
+//            case IFJ18_TYPE_FLOAT:
+//              type = "float@0.0";
+//              break;
+//            }
+//            printf("PUSHS %s\n \
+//                  POPFRAME\n \
+//                  RETURN\n",
+//                   type);
+//          }
+//        }
+//      }
+//    }
+//  }
 }
 
 int STATEMENT_LIST(ifj18_obj_t *func) {
-  switch (token->type) {
-  case TOKEN_END_OF_LINE:
-    get_token();
-    return STATEMENT_LIST(func);
-  case TOKEN_END:
-    get_token();
-    return 1;
-  case TOKEN_ID:
-  case TOKEN_IF:
-  case TOKEN_WHILE:
-  case TOKEN_PRINT:
-  case TOKEN_INPUTF:
-  case TOKEN_INPUTS:
-  case TOKEN_INPUTI:
-    STATEMENT();
-    return STATEMENT_LIST(func);
-  default:
-    return 0;
-    break;
-  }
+    switch (token->type) {
+        case TOKEN_END_OF_LINE:
+            get_token();
+            return STATEMENT_LIST(func);
+        case TOKEN_END:
+            get_token();
+            return 1;
+        case TOKEN_ID:
+        case TOKEN_IF:
+        case TOKEN_WHILE:
+        case TOKEN_PRINT:
+            STATEMENT(func);
+            return STATEMENT_LIST(func);
+        default:
+            return 0;
+            break;
+    }
 }
 
-int STATEMENT() {
-  switch (token->type) {
-  case TOKEN_END_OF_LINE:
-    return 1;
-  case TOKEN_ID:
-    // return parse_id();
-  case TOKEN_IF:
-    // return parse_if();
-  case TOKEN_WHILE:
-    // return parse_while();
-  case TOKEN_PRINT:
-    // return parse_print();
-  case TOKEN_INPUTF:
-    // return parse_inputf();
-  case TOKEN_INPUTS:
-    // return parse_inputs();
-  case TOKEN_INPUTI:
-    // return parse_inputi();
-  default:
-    return 0;
-  }
+int STATEMENT(ifj18_obj_t *func) {
+    switch (token->type) {
+        case TOKEN_END_OF_LINE:
+            return 1;
+        case TOKEN_ID:
+            get_token();
+            if (token->type == TOKEN_OP_ASSIGN) {
+                return expression(func);
+            }
+        case TOKEN_IF:
+        case TOKEN_WHILE:
+        case TOKEN_PRINT:
+            return 0;
+        default:
+            return 0;
+    }
 }
 
-int PARAM_LIST(ifj18_obj_t *func) {
-  get_token();
+void PARAM_LIST(ifj18_obj_t *func, char param_found) {
+    if(!param_found && token->type == TOKEN_RPAREN){
+        error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
+    }
+    else if( (param_found && token->type == TOKEN_RPAREN) || ( !param_found && token->type == TOKEN_END_OF_LINE ) ){
+        return;
+    }
+    token_prettyprint(token);
 
-  if (token->type == TOKEN_COMMA) {
-    return 0;
-  }
+    check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "function parameter expected to be identifier");
 
-  if (token->type == TOKEN_RPAREN) {
-    return 1;
-  }
+    if( ifj18_hash_has(func->obj_type.func.local_symtable, token->value->as_string->value) ){
+        error(SEMANTIC_ERROR, "Implicit declaration of function argument");
+    }
 
-  if (token->type != TOKEN_COMMA) {
-    // if (!expression())
-    //   return 0;
-  }
 
-  if (token->type == TOKEN_COMMA) {
-    return PARAM_LIST(func);
-  }
+    ifj18_hash_set(func->obj_type.func.local_symtable, token->value->as_string->value, NULL);
 
-  return 0;
+    func->obj_type.func.params_num++;
+
+    get_token();
+
+    if(token->type == TOKEN_COMMA){
+        get_token();
+        check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Expecting identifier after comma");
+    }
+
+    PARAM_LIST(func, param_found);
 }

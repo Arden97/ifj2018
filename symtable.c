@@ -25,7 +25,15 @@ inline ifj18_obj_t *ifj18_hash_get(khash_t(value) * self, char *key) {
  */
 
 inline int ifj18_hash_has(khash_t(value) * self, char *key) {
+//  printf("inside of hash_has\n");
+
   khiter_t k = kh_get(value, self, key);
+
+//  printf("after kh_get\n");
+  if(k == NULL){
+    return 0;
+  }
+
   return kh_exist(self, k);
 }
 

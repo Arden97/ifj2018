@@ -1,6 +1,6 @@
-s1 = "Toto je nejaky text"
-s2 = s1 + ", ktery jeste trochu obohatime"
-print s1, "\n", s2, "\n"
+#s1 = "Toto je nejaky text"
+#s2 = s1 + ", ktery jeste trochu obohatime"
+#print s1, "\n", s2, "\n"
 #s1len = length(s1)
 #s1len = s1len - 4 + 1
 #s1 = substr(s2, s1len, 4)
@@ -10,3 +10,5 @@ print s1, "\n", s2, "\n"
 #s1 = inputs
 #end
 #
+def asd a,b
+end

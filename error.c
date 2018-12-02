@@ -43,6 +43,6 @@ void error_msg(int error_code, char *details){
 
 void error(int error_code, char *details){
   error_msg(error_code, details);
-  gc_dispose();
+//  gc_dispose();
   exit(error_code);
 }

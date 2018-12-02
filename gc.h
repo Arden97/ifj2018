@@ -5,7 +5,7 @@
 #include "list.h"
 #include <stddef.h>
 
-extern tList *adata;
+tList *garbage_list;
 
 void *find(void *ptr);
 void *gc_malloc(size_t size);

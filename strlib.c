@@ -1,9 +1,10 @@
 #include "strlib.h"
 
 int string_init(string *str) {
-  if ((str->value = (char *)malloc(8)) == NULL)
-    //exit_error("Allocation failed.", INTERNAL_ERR);
+  if ((str->value = (char *)malloc(8)) == NULL) {
 
+  }
+    //exit_error("Allocation failed.", INTERNAL_ERR);
   str->value[0] = str->length = 0;
   return 1;
 }

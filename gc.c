@@ -7,7 +7,7 @@
 
 void *find(void *ptr) {
 
-    tListElementPtr tmp = adata->Last;
+    tListElementPtr tmp = garbage_list->Last;
 
     while (tmp != NULL) {
         if (tmp->val == ptr) {
@@ -59,15 +59,15 @@ void gc_free(void *ptr) {
 }
 
 void gc_dispose() {
-    while (copy_last(adata) != NULL) {
-        free(copy_last(adata)); //free usefull val
+    while (copy_last(garbage_list) != NULL) {
+        free(copy_last(garbage_list)); //free usefull val
         gc_pop();     //free structure from G
 
     }
 }
 
 void gc_delete(void *element) {
-    tListElementPtr tmp = adata->Last;
+    tListElementPtr tmp = garbage_list->Last;
 
     while (tmp != NULL) {
         if (tmp == element) {            //delete this one
@@ -76,11 +76,11 @@ void gc_delete(void *element) {
                 tmp->lptr->rptr = tmp->rptr;
             } else if (tmp->rptr != NULL) {
                 tmp->rptr->lptr = tmp->lptr;
-                adata->First = tmp->rptr;
+                garbage_list->First = tmp->rptr;
 
             } else if (tmp->lptr != NULL) {
                 tmp->lptr->rptr = tmp->rptr;
-                adata->Last = tmp->lptr;
+                garbage_list->Last = tmp->lptr;
             }
             free(tmp);
             break;
@@ -103,16 +103,16 @@ void gc_append(void *val) {
 
         result->val = val;
 
-        if (adata->First == NULL) {   //Empty list
-            adata->First = result;
-            adata->Last = result;
+        if (garbage_list->First == NULL) {   //Empty list
+            garbage_list->First = result;
+            garbage_list->Last = result;
             result->rptr = NULL;
             result->lptr = NULL;
         } else {                  //One or more elements in list
-            result->lptr = adata->Last;
-            adata->Last->rptr = result;
+            result->lptr = garbage_list->Last;
+            garbage_list->Last->rptr = result;
             result->rptr = NULL;
-            adata->Last = result;
+            garbage_list->Last = result;
         }
     }
 }
@@ -120,22 +120,22 @@ void gc_append(void *val) {
 void gc_pop() {
     tListElementPtr tmp;
 
-    if (adata->First == NULL) {
+    if (garbage_list->First == NULL) {
         return;
     }
 
-    if (adata->Last == adata->Active) {
-        adata->Active = NULL;
+    if (garbage_list->Last == garbage_list->Active) {
+        garbage_list->Active = NULL;
     }
 
-    if (adata->First == adata->Last) {
-        free(adata->First);
-        adata->First = NULL;
-        adata->Last = NULL;
+    if (garbage_list->First == garbage_list->Last) {
+        free(garbage_list->First);
+        garbage_list->First = NULL;
+        garbage_list->Last = NULL;
     } else {
-        tmp = adata->Last->lptr;
-        free(adata->Last);
-        adata->Last = tmp;
-        adata->Last->rptr = NULL;
+        tmp = garbage_list->Last->lptr;
+        free(garbage_list->Last);
+        garbage_list->Last = tmp;
+        garbage_list->Last->rptr = NULL;
     }
 }
