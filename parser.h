@@ -10,7 +10,7 @@ int DEFINE_FUNCTION();
 int STATEMENT_LIST(ifj18_obj_t *func);
 int STATEMENT(ifj18_obj_t *func);
 int CALL_ASIGN();
-int PARAM_LIST(ifj18_obj_t *func);
+void PARAM_LIST(ifj18_obj_t *func, char param_found);
 int NEXT_PARAM();
 int parse_id();
 int parse_if();
