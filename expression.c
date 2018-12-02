@@ -25,11 +25,11 @@ char flags[4] = {0, 0, 0, 0};
 #define FG_INPUTF 2
 #define FG_INPUTS 3
 
-int expression(ifj18_obj_t *func) {
+int expression(ifj18_obj_t *func, char *ret_var) {
   if (is_function())
     return function(func);
   else
-  return inf_to_post(func);
+    return inf_to_post(func, ret_var);
 }
 
 int is_function() {
@@ -130,7 +130,7 @@ void print_length() {
 int shift_to_stack(ifj18_token_t *stack_token) {
 
   /// calculate index to the precedence table
-  unsigned index_y = token->type - TOKEN_OP_PLUS; // coordinates y
+  unsigned index_y = token->type - TOKEN_OP_PLUS;       // coordinates y
   unsigned index_x = stack_token->type - TOKEN_OP_PLUS; // coordinates x
 
   /// special recalculating for both types brackets
@@ -188,8 +188,9 @@ ifj18_token_t *copy_token(ifj18_token_t *act_token) {
   /// copy type, string and his length to the atributes of new token
   new_token->type = act_token->type;
 
-  if (act_token->value->as_string)
+  if (act_token->value->as_string) {
     strcpy(new_token->value->as_string->value, act_token->value->as_string->value);
+  }
   new_token->value->as_string->length = act_token->value->as_string->length;
   return new_token;
 }
@@ -201,32 +202,40 @@ ifj18_var check_operands(ifj18_obj_t *operand_1, ifj18_obj_t *operand_2) {
     return 0;
 }
 
-void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
+void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var) {
   ifj18_stack_t *output_stack = stack_init();
-  printf("123\n");
   while (!stack_empty(postfix_stack)) {
     ifj18_token_t *act_token = stack_top(postfix_stack);
     stack_pop(postfix_stack);
     // if token == operand
-    if (act_token->type == TOKEN_ID || act_token->type == TOKEN_FLOAT || act_token->type == TOKEN_INT) {
-      ifj18_obj_t *operand = ifj18_hash_get(act_function->obj_type.func.local_symtable, act_token->value->as_string);
-      if (!operand) {
-        error(SEMANTIC_ERROR, "there is no such variable");
+    if (act_token->type == TOKEN_ID) {
+      ifj18_obj_t *operand_id = find_var(act_token, act_function);
+      if (operand_id) {
+        stack_push(output_stack, operand_id);
       }
-      stack_push(output_stack, operand);
-      // list_insert("PUSHS ", operand, NULL, NULL);
-    } else {
+    }
+    else if (act_token->type == TOKEN_INT) {
+      ifj18_obj_t *number;
+      number->obj_type.var.value.as_int = act_token->value->as_int;
+      stack_push(output_stack, number);
+    }
+    else if (act_token->type == TOKEN_FLOAT) {
+      ifj18_obj_t *number;
+      number->obj_type.var.value.as_float = act_token->value->as_float;
+      stack_push(output_stack, number);
+    }
+    else { // it's operator
       ifj18_obj_t *operand_1 = stack_top(output_stack); /// obtaining fist operand
       stack_pop(output_stack);
       ifj18_obj_t *operand_2 = stack_top(output_stack); /// obtaining second operand
       stack_pop(output_stack);
+
       switch (act_token->type) {
       case TOKEN_OP_PLUS:
-        // TODO: third variable?
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("ADD %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("ADD %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("ADD %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("ADD %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -234,9 +243,9 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_MINUS:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("SUB %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value);
+          printf("SUB %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("SUB %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("SUB %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -244,9 +253,9 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_MUL:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("MUL %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("MUL %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("MUL %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("MUL %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -254,7 +263,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_DIV:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("DIV %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("DIV %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -262,11 +271,11 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_LT:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("LT %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("LT %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("LT %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("LT %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-          printf("LT %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("LT %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -274,11 +283,11 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_GT:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("GT %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("GT %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("GT %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("GT %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-          printf("GT %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("GT %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -286,14 +295,14 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_LTE:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("GTS %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("GTS %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("NOTS %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("GTS %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("GTS %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("NOTS %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-          printf("GTS %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("GTS %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("NOTS %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -301,14 +310,14 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_GTE:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("LTS %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("LTS %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("NOTS %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("LTS %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("LTS %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("NOTS %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-          printf("LTS %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("LTS %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("NOTS %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -316,11 +325,11 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_ASSIGN:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("EQ %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("EQ %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("EQ %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("EQ %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-          printf("EQ %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("EQ %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -328,14 +337,14 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
 
       case TOKEN_OP_NEQ:
         if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-          printf("EQS %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("EQS %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
+          printf("NOTS %s %d %d\n", ret_var, operand_1->obj_type.var.value.as_int, operand_2->obj_type.var.value.as_int);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-          printf("EQS %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("EQS %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
+          printf("NOTS %s %f %f\n", ret_var, operand_1->obj_type.var.value.as_float, operand_2->obj_type.var.value.as_float);
         } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-          printf("EQS %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
-          printf("NOTS %s %s\n", operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("EQS %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
+          printf("NOTS %s %s %s\n", ret_var, operand_1->obj_type.var.value.as_pointer, operand_2->obj_type.var.value.as_pointer);
         } else {
           error(TYPE_ERROR, "operands should have same type");
         }
@@ -345,7 +354,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function) {
   }
 }
 
-int inf_to_post(ifj18_obj_t *act_function) {
+int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
   ifj18_token_t *stack_token;
 
   unsigned count_of_bracket = 0;
@@ -359,7 +368,7 @@ int inf_to_post(ifj18_obj_t *act_function) {
   /// marks, which means end of the expression
   while (token->type != TOKEN_END_OF_LINE && token->type != TOKEN_THEN && token->type != TOKEN_COMMA && token->type != TOKEN_END_OF_FILE) {
     /// operand adds to the output stack with postfix expression
-    if (token->type == TOKEN_ID || token->type == TOKEN_FLOAT || token->type == TOKEN_INT) {      
+    if (token->type == TOKEN_ID || token->type == TOKEN_FLOAT || token->type == TOKEN_INT) {
       sum_count--;
       stack_token = copy_token(token);
       stack_push(output_stack, stack_token);
@@ -400,5 +409,55 @@ int inf_to_post(ifj18_obj_t *act_function) {
     error(SYNTAX_ERROR, "error while parsing expressions");
 
   /// generating instruction
-  post_to_instr(infix_stack, act_function);
+  post_to_instr(infix_stack, act_function, ret_var);
+}
+
+// ifj18_obj_t *store_primitive(ifj18_token *primitive_token) {
+
+//   /// check that same constant yet not store in the table
+//   // htab_item_t *is_find = htab_find(const_symtable, const_token->str->string);
+//   ifj18_obj_t *found = ifj18_hash_get(primitive_table, token->value->as_string);
+
+//   if (!is_find) {
+//     variable_t *new_constant = init_variable();
+//     /// store integer constant
+//     if (const_token->type == INT_NUMBER) {
+//       new_constant->data_type = INTEGER;
+//       new_constant->data.i = strtol(const_token->str->string, NULL, 10);
+//     }
+//     /// store double constant
+//     else if (const_token->type == DOUBLE_NUMBER) {
+//       new_constant->data_type = DOUBLE;
+//       new_constant->data.d = strtod(const_token->str->string, NULL);
+//     }
+//     /// store string constant and alloc new memory
+//     else if (const_token->type == TEXT) {
+//       new_constant->data_type = STRING;
+//       new_constant->data.str = malloc((const_token->str->length) + 1);
+//       if (!new_constant->data.str)
+//         print_err(99);
+//       strcpy(new_constant->data.str, const_token->str->string);
+//     }
+//     new_constant->constant = true;
+//     /// find newly stored variable and sets of the relevant parameters
+//     is_find = htab_insert(const_symtable, const_token->str->string);
+//     if (!is_find)
+//       print_err(99);
+//     is_find->is_function = 0;
+//     is_find->data.var = new_constant;
+//   }
+
+//   return is_find->data.var;
+// }
+
+ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
+
+  /// find variable in local symtable of actual function
+  if (find_token->type == TOKEN_ID) {
+    ifj18_obj_t *found = ifj18_hash_get(act_function->obj_type.func.local_symtable, token->value->as_string->value);
+    /// we did not find
+    if (!found)
+      error(SEMANTIC_ERROR, "undefined variable in epression");
+    return found;
+  }
 }
