@@ -98,6 +98,7 @@ int DEFINE_FUNCTION() {
 
 
 
+
 //  if (token->type == TOKEN_ID) {
 //
 //    if (ifj18_hash_has(global_table, token->value->as_string)) {
