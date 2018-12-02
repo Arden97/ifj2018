@@ -119,23 +119,6 @@ int length() {
   printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
 }
 
-void check_arg(int required_type, char id_allowed) {
-  if ((token->type != required_type) || (id_allowed && token->type != TOKEN_ID)) {
-    error(SEMANTIC_ERROR, "Incorrect type");
-  }
-}
-
-void check_token_type(int required_type, int error_type, int inv) {
-  if (inv) {
-    if (token->type != required_type) {
-      error(error_type, "");
-    }
-  } else {
-    if (token->type == required_type) {
-      error(error_type, "");
-    }
-  }
-}
 
 void print_length() {
   if (!flags[FG_LENGTH] && flags[FG_LENGTH]++) {

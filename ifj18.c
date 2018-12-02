@@ -8,9 +8,13 @@
 #include "parser.h"
 
 
-tList *adata = NULL;
-
 int main() {
+  if((garbage_list=malloc(sizeof(tList))) == NULL) {
+    fprintf(stderr, "InternalError: Memory Allocation has failed\n");
+    exit(99);
+  }
+
+  init_list(garbage_list);
   // ifj18_obj_t *tmp = init_var();
   global_table = ifj18_hash_new();
 
@@ -23,4 +27,5 @@ int main() {
 
   get_token();
   PROG();
+  //PROG();
 }

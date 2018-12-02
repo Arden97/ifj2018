@@ -274,3 +274,35 @@ ifj18_token_t *get_token() {
       return save_token(TOKEN_ILLEGAL);
   }
 }
+
+
+void check_arg(int required_type, char id_allowed) {
+  if ((token->type != required_type) || (id_allowed && token->type != TOKEN_ID)) {
+    error(SEMANTIC_ERROR, "Incorrect type");
+  }
+}
+
+void check_token_type(int required_type, int error_type, int inv) {
+  if (inv) {
+    if (token->type != required_type) {
+      error(error_type, "");
+    }
+  } else {
+    if (token->type == required_type) {
+      error(error_type, "");
+    }
+  }
+}
+
+void check_token_type_msg(int required_type, int error_type, int inv, char *message) {
+  if (inv) {
+    if (token->type != required_type) {
+      error(error_type, message);
+    }
+  } else {
+    if (token->type == required_type) {
+      error(error_type, message);
+    }
+  }
+  printf("end of check_token\n");
+}
