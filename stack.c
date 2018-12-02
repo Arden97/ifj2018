@@ -5,7 +5,7 @@
 
 ifj18_stack_t *stack_init() {
   ifj18_stack_t *s;
-  if (!(s = (stack_t *)malloc(sizeof(stack_t))))
+  if (!(s = (ifj18_stack_t *)malloc(sizeof(ifj18_stack_t))))
     error(INTERNAL_ERROR, "stack memory allocation");
   s->top_ptr = NULL;
   return s;
