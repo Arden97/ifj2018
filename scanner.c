@@ -260,7 +260,7 @@ ifj18_token_t *get_token() {
       while ((c = fgetc(stdin)) != '\n' && c) ; ungetc(c, stdin);
       goto scan;
     case '\n':
-      save_token(TOKEN_END_OF_LINE);
+      return save_token(TOKEN_END_OF_LINE);
     case '\r':
       goto scan;
     case '"':
@@ -304,5 +304,5 @@ void check_token_type_msg(int required_type, int error_type, int inv, char *mess
       error(error_type, message);
     }
   }
-  printf("end of check_token\n");
+//  printf("end of check_token\n");
 }

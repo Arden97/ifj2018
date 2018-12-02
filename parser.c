@@ -2,6 +2,7 @@
 
 int PROG() {
     printf("start PROG\n");
+    token_prettyprint(token);
     ifj18_obj_t *main_func = init_func();
     printf("init_func() complete\n");
     switch (token->type) {
@@ -67,10 +68,14 @@ int DEFINE_FUNCTION() {
     printf("init_func() complete \n");
     get_token();
 
+    token_prettyprint(token);
+
+
     check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Incorrect token after def");
 
     printf("Check hash_has\n");
-    printf("token: %s\n", token->value->as_string->value);
+
+
     if (ifj18_hash_has(global_table, token->value->as_string->value)) {
         printf("inside of hash_has error\n");
         error(SEMANTIC_ERROR, "ID has been defined already");
@@ -175,12 +180,19 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found) {
     if(!param_found && token->type == TOKEN_RPAREN){
         error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
     }
-    else if((param_found && token->type == TOKEN_RPAREN) || token->type == TOKEN_END_OF_LINE){
+    else if( (param_found && token->type == TOKEN_RPAREN) || ( !param_found && token->type == TOKEN_END_OF_LINE ) ){
         return;
+    }
+    token_prettyprint(token);
+
+    check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "function parameter expected to be identifier");
+
+    if( ifj18_hash_has(func->obj_type.func.local_symtable, token->value->as_string->value) ){
+        error(SEMANTIC_ERROR, "Implicit declaration of function argument");
     }
 
 
-    check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Incorrect token after def");
+    ifj18_hash_set(func->obj_type.func.local_symtable, token->value->as_string->value, NULL);
 
     func->obj_type.func.params_num++;
 
@@ -192,5 +204,4 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found) {
     }
 
     PARAM_LIST(func, param_found);
-
 }

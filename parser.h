@@ -4,6 +4,7 @@
 #include "symtable.h"
 #include <stdio.h>
 #include "expression.h"
+#include "prettyprint.h"
 
 int PROG();
 int DEFINE_FUNCTION();

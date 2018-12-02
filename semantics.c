@@ -25,12 +25,12 @@ ifj18_obj_t *init_func() {
   if (func == NULL) {
     // todo: add error
   }
-
-  string *params;
+  string *params = malloc(sizeof(string));
   string_init(params);
   func->sparams = params;
   func->return_var = var;
   func->params_num = 0;
+  func->local_symtable = ifj18_hash_new();
 
   ifj18_obj_t *obj_func = (ifj18_obj_t *)malloc(sizeof(ifj18_obj_t));
   obj_func->obj_type.func = *func;

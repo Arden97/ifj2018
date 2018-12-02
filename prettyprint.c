@@ -1,8 +1,10 @@
 #include "scanner.h"
 #include <stdio.h>
+#include "prettyprint.h"
 
 void token_prettyprint(ifj18_token_t *token) {
-  printf("%s", ifj18_token_type_string(token->type));
+  printf("%sTOKEN:", KBLU);
+
   switch (token->type) {
   case TOKEN_INT:
     printf(" %d", token->value->as_int);
@@ -16,6 +18,10 @@ void token_prettyprint(ifj18_token_t *token) {
   case TOKEN_ID:
     printf(" %s", token->value->as_string->value);
     break;
+  default:
+    printf(" %d", token->type);
+    break;
   }
+  printf("%s", RESET);
   printf("\n");
 }

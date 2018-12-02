@@ -14,6 +14,7 @@ int main() {
     exit(99);
   }
 
+
   global_table = ifj18_hash_new();
   init_list(garbage_list);
 
