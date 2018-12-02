@@ -5,58 +5,21 @@ int PROG() {
     token_prettyprint(token);
     ifj18_obj_t *main_func = init_func();
     printf("# init_func() complete\n");
-    switch (token->type) {
-        case TOKEN_DEF:
-//    if (DEFINE_FUNCTION()) {
-////      if (token->type == TOKEN_END_OF_LINE) {
-////        get_token();
-////        return PROG();
-////      }
-////    }
-            DEFINE_FUNCTION();
+    while(1){
+        switch (token->type) {
+            case TOKEN_DEF:
+                DEFINE_FUNCTION();
+                break;
+            case TOKEN_END_OF_LINE:
+                get_token();
+                break;
+            default:
+                if(STATEMENT(main_func)){
+                    return 1;
+                };
+                break;
+        }
 
-//
-
-
-            break;
-        case TOKEN_END_OF_LINE:
-            get_token();
-            return PROG();
-        case TOKEN_IF:
-            if (STATEMENT(main_func)) {
-                if (token->type == TOKEN_THEN) {
-                    get_token();
-                    if (token->type == TOKEN_END_OF_LINE) {
-                        get_token();
-                        return PROG();
-                    }
-                }
-            }
-            break;
-        case TOKEN_ID:
-            if (STATEMENT(main_func)) {
-                if (token->type == TOKEN_END_OF_LINE) {
-                    get_token();
-                    return PROG();
-                }
-            }
-            break;
-        case TOKEN_WHILE:
-            if (STATEMENT(main_func)) {
-                if (token->type == TOKEN_END_OF_LINE) {
-                    get_token();
-                    return PROG();
-                } else if (token->type == TOKEN_DO) {
-                    get_token();
-                    if (token->type == TOKEN_END_OF_LINE) {
-                        get_token();
-                        return PROG();
-                    }
-                }
-            }
-            break;
-        case TOKEN_END_OF_FILE:
-            return 0;
     }
 }
 
@@ -94,7 +57,6 @@ int DEFINE_FUNCTION() {
     }
 
     PARAM_LIST(func, paren_found);
-
 
 
 
@@ -139,34 +101,20 @@ int DEFINE_FUNCTION() {
 //  }
 }
 
-int STATEMENT_LIST(ifj18_obj_t *func) {
-    switch (token->type) {
-        case TOKEN_END_OF_LINE:
-            get_token();
-            return STATEMENT_LIST(func);
-        case TOKEN_END:
-            get_token();
-            return 1;
-        case TOKEN_ID:
-        case TOKEN_IF:
-        case TOKEN_WHILE:
-        case TOKEN_PRINT:
-            STATEMENT(func);
-            return STATEMENT_LIST(func);
-        default:
-            return 0;
-            break;
-    }
-}
-
 int STATEMENT(ifj18_obj_t *func) {
+    token_prettyprint(token);
+    char *token_id_name;
+
     switch (token->type) {
-        case TOKEN_END_OF_LINE:
+        case TOKEN_END_OF_FILE:
             return 1;
+
         case TOKEN_ID:
+            token_id_name = token->value->as_string->value;
             get_token();
             if (token->type == TOKEN_OP_ASSIGN) {
-                return expression(func);
+                printf("DEF LF@%s\n", token_id_name);
+                return expression(func, "retval");
             }
         case TOKEN_IF:
         case TOKEN_WHILE:

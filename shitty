@@ -13,3 +13,4 @@
 #def asd a,b
 #end
 def asd b, a
+a = 1
