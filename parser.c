@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "semantics.h"
 
 int PROG() {
     printf("CREATEFRAME\n");
@@ -60,8 +61,14 @@ int DEFINE_FUNCTION() {
         paren_found = 1;
         get_token();
     }
+    string *parameters[30];
 
-    PARAM_LIST(func, paren_found);
+
+    PARAM_LIST(func, paren_found, parameters);
+
+    for(int i=0; i<func->obj_type.func.params_num; i++){
+        debug_info("parameters[%d] %s\n", i, parameters[i]->value);
+    }
 
     printf("JUMP ");
     printf(FUNC_JUMP_AFTER_TEMPLATE, func_name);
@@ -76,6 +83,11 @@ int DEFINE_FUNCTION() {
            "DEFVAR LF@%s\n", FUNC_RETURN_VARNAME);
     printf("MOVE LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
 
+    for(int i=0; i<func->obj_type.func.params_num; i++){
+        debug_info("parameters[%d] %s\n", i, parameters[i]->value);
+        printf("MOVE LF@%s LF@%%%d\n",parameters[i]->value, i+1);
+    }
+
     get_token();
 
     debug_info("# Statements inside of function\n");
@@ -84,7 +96,8 @@ int DEFINE_FUNCTION() {
     while (1) {
         debug_info("Current token: ");
         token_prettyprint(token);
-        if (STATEMENT(func) == TOKEN_END) {
+        statement_token = STATEMENT(func);
+        if (statement_token == TOKEN_END) {
             get_token();
             break;
         }
@@ -119,7 +132,7 @@ int STATEMENT(ifj18_obj_t *func) {
                 debug_info("Sent LF@%s as variable to save expr\n", token_id_name);
                 get_token();
                 expression(func, token_id_name);
-                printf("MOV LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
+                printf("MOVE LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
             } else {
                 expression(func, FUNC_RETURN_VARNAME);
             }
@@ -138,7 +151,7 @@ int STATEMENT(ifj18_obj_t *func) {
 }
 
 
-void PARAM_LIST(ifj18_obj_t *func, char param_found) {
+void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     token_prettyprint(token);
     if (!param_found && token->type == TOKEN_RPAREN) {
         error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
@@ -153,9 +166,11 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found) {
     }
 
 
+
     ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value, NULL);
 
-    func->obj_type.func.params_num++;
+
+    parameters[func->obj_type.func.params_num++] = token->value->as_string;
 
     get_token();
 
@@ -164,5 +179,6 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found) {
         check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Expecting identifier after comma");
     }
 
-    PARAM_LIST(func, param_found);
+    PARAM_LIST(func, param_found, parameters);
+
 }
