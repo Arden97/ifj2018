@@ -17,10 +17,10 @@ int PROG() {
                 get_token();
                 break;
             default:
-                if (STATEMENT(main_func)) {
+                if(STATEMENT(main_func) == TOKEN_END_OF_FILE){
                     return 1;
-                };
-                break;
+                }
+                get_token();
         }
 
     }
@@ -48,9 +48,11 @@ int DEFINE_FUNCTION() {
 
     printf("# Set hash funct\n");
 
-    ifj18_hash_set(global_table, token->value->as_string->value, func);
-
     char *func_name = token->value->as_string->value;
+
+    ifj18_hash_set(global_table, func_name, func);
+
+    printf("Hash function set %d\n", ifj18_hash_has(global_table, func_name));
 
     get_token();
 //    printf("pizdozo: %s\n",func_name);
@@ -75,12 +77,14 @@ int DEFINE_FUNCTION() {
     int statement_token;
     while (1) {
         get_token();
+        printf("# Iteration\n");
         token_prettyprint(token);
         statement_token = STATEMENT(func);
         if(statement_token == TOKEN_END_OF_FILE){
             error(SYNTAX_ERROR, "Unexpected EOF in function definition");
         }
         else if(statement_token == TOKEN_END){
+            printf("# End for function found\n");
             return 1;
         }
 
@@ -100,16 +104,14 @@ int STATEMENT(ifj18_obj_t *func) {
             get_token();
             if (token->type == TOKEN_OP_ASSIGN) {
                 printf("DEF LF@%s\n", token_id_name);
-                expression(func, token_id_name);
                 printf("#Sent LF@%s as variable to save expr\n", token_id_name);
+                expression(func, token_id_name);
                 printf("MOV LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
             }
-            else if(token->type == TOKEN_LPAREN) {
-                PARSE_FUNCTION_CALL();
+            else{
+                expression(func, FUNC_RETURN_VARNAME);
             }
-            else {
-//                expression(func, FUNC_RETURN_VARNAME);
-            }
+
 
 
             break;
@@ -124,11 +126,6 @@ int STATEMENT(ifj18_obj_t *func) {
     }
 }
 
-void PARSE_FUNCTION_CALL(){
-    if(!ifj18_hash_has(global_table, token->value->as_string->value)){
-
-    }
-}
 
 void PARAM_LIST(ifj18_obj_t *func, char param_found) {
     token_prettyprint(token);

@@ -40,6 +40,4 @@ ifj18_obj_t *init_func();
 
 struct ifj18_hash_t *global_table;
 
-ifj18_obj_t *init_var();
-ifj18_obj_t *init_func();
 #endif

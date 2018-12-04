@@ -33,7 +33,7 @@ int expression(ifj18_obj_t *func, char *ret_var) {
 }
 
 int is_function() {
-  ifj18_obj_t *symbol = ifj18_hash_get(global_table, token->value->as_string);
+  ifj18_obj_t *symbol = ifj18_hash_get((kh_value_t *) global_table, token->value->as_string->value);
   switch (token->type) {
   case TOKEN_CHR:
   case TOKEN_ORD:
@@ -79,8 +79,8 @@ int function(ifj18_obj_t *act_function) {
     break;
   }
 
-  char *key = token->value->as_string;
-  ifj18_obj_t *func = ifj18_hash_get(global_table, key);
+  char *key = token->value->as_string->value;
+  ifj18_obj_t *func = ifj18_hash_get((kh_value_t *) global_table, key);
   int params_num = func->obj_type.func.params_num;
 
   get_token();

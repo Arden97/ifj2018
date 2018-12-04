@@ -13,11 +13,5 @@
 #def asd a,b
 #end
 def asd b, a
-a = a+1
-
-if a+1 < 0
-    b+1
+a = 1
 end
-
-end
-
