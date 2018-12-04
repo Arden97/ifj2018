@@ -402,7 +402,6 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
   ifj18_stack_t *output_stack = stack_init();
   ifj18_stack_t *infix_stack = stack_init();
 
-  get_token();
   int prev_token = 99; // default
   /// marks, which means end of the expression
   while (token->type != TOKEN_END_OF_LINE && token->type != TOKEN_THEN && token->type != TOKEN_COMMA && token->type != TOKEN_END_OF_FILE) {
