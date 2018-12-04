@@ -102,6 +102,9 @@ void check_token_type_msg(int required_type, int error_type, int inv, char *mess
 #define FUNC_RETURN_VARNAME "$$_retval"
 #define FUNC_JUMP_AFTER_TEMPLATE "$$__%s_after__$$"
 #define FUNCTION_LABEL_TEMPLATE "$__%s"
+#define TEMP_EXPRESSION_VARNAME "$$__tmp_val"
+#define COND_EXPR_RESULT_VARNAME "$$__expr_res"
+
 /*
  * INTERNAL FUNCTION $__name
  * INTERNAL VARIABLE $$__name

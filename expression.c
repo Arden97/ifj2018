@@ -180,8 +180,8 @@ void psa_operation(ifj18_stack_t *operators_stack, ifj18_stack_t *output_stack, 
     /// case for empty stack, marks in precedence table or left bracket
     if (stack_empty(operators_stack) || shift_to_stack(stack_token) || stack_token->type == TOKEN_LPAREN) {
         stack_token = copy_token(token);
-        printf("#Current token in psa: ");
-        token_prettyprint(stack_token);
+        debug_info("#Current token in psa: ");
+//        token_prettyprint(stack_token);
         stack_push(operators_stack, stack_token);
     } else {
         /// have to marks of reduction in the table and stack dont have to be empty
@@ -224,13 +224,13 @@ ifj18_var check_operands(ifj18_obj_t *operand_1, ifj18_obj_t *operand_2) {
 }
 
 void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var) {
-    stack_print(postfix_stack);
+//    stack_print(postfix_stack);
     ifj18_stack_t *output_stack = stack_init();
     while (!stack_empty(postfix_stack)) {
 
         ifj18_token_t *act_token = stack_top(postfix_stack);
-        printf("# POP:");
-        token_prettyprint(act_token);
+//        debug_info("POP:");
+//        token_prettyprint(act_token);
         stack_pop(postfix_stack);
 
         //printf("#%d\n", act_token->value->as_int);
@@ -255,7 +255,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
         } else { // it's an operator
             char *prefix_1 = (char *) malloc(20);
             char *prefix_2 = (char *) malloc(20);
-            stack_print_objects(output_stack);
+            //stack_print_objects(output_stack);
             ifj18_obj_t *operand_1 = stack_top(output_stack); /// obtaining fist operand
             stack_pop(output_stack);
             // ifj18_obj_t *check = stack_top(output_stack);
@@ -292,7 +292,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
 
 
 
-            printf("######\n");
+            debug_info("######\n");
             switch (act_token->type) {
                 case TOKEN_OP_PLUS:
                     if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
@@ -450,7 +450,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
         }
     }
     if (!stack_empty(output_stack)) {
-        printf("######\n");
+        debug_info("######\n");
         ifj18_obj_t *only_operand = stack_top(output_stack);
         stack_pop(output_stack);
         if (only_operand->obj_type.var.type == IFJ18_TYPE_INT) {
@@ -461,7 +461,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
             printf("MOV LF@%s LF@%s\n", ret_var, only_operand->obj_type.var.var_name);
         }
     }
-    printf("######\n");
+    debug_info("######\n");
 }
 
 int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
@@ -508,7 +508,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
             psa_operation(infix_stack, output_stack, stack_token);
         }
 
-        token_prettyprint(token);
+//        token_prettyprint(token);
         get_token();
     }
 

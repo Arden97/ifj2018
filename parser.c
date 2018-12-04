@@ -17,6 +17,8 @@ int PROG() {
             case TOKEN_END_OF_LINE:
                 get_token();
                 break;
+            case TOKEN_END:
+                error(SYNTAX_ERROR, "Closing tag end without matching opening one.");
             default:
                 if (STATEMENT(main_func) == TOKEN_END_OF_FILE) {
                     return 1;
@@ -101,6 +103,9 @@ int DEFINE_FUNCTION() {
             get_token();
             break;
         }
+        else if(statement_token == TOKEN_END_OF_FILE){
+            error(SYNTAX_ERROR, "Unexpected EOF\n");
+        }
     }
 
     debug_info("End of function found\n");
@@ -111,6 +116,7 @@ int DEFINE_FUNCTION() {
     printf(FUNC_JUMP_AFTER_TEMPLATE, func_name);
     printf("\n");
 
+    return 1;
 
 }
 
@@ -138,6 +144,7 @@ int STATEMENT(ifj18_obj_t *func) {
             }
             break;
         case TOKEN_IF:
+            get_token();
         case TOKEN_WHILE:
         case TOKEN_PRINT:
             return 0;

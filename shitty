@@ -12,6 +12,6 @@
 #
 #def asd a,b
 #end
-def asd b, a
-a = 1
+def asd (b, a)
+a = 1+1
 end

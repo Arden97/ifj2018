@@ -1,5 +1,6 @@
 #include "error.h"
 #include "gc.h"
+#include "utils.h"
 
 void error_msg(int error_code, char *details){
   char *err_msg;
@@ -17,23 +18,26 @@ void error_msg(int error_code, char *details){
       break;
 
     case TYPE_ERROR:
-      err_msg = "Type compatibility error";
+      err_msg = "";
       break;
 
     case ARGS_ERROR:
-      err_msg = "Wrong number of arguments";
+      err_msg = "ArgumentsError";
       break;
 
     case SEMANTIC_ERROR:
-      err_msg = "Semantic error";
+      err_msg = "SemanticError";
       break;
 
     case DIVBYZERO_ERROR:
-      err_msg = "Attempting to divide by zero";
+      err_msg = "DivisionByZeroError";
       break;
 
     case INTERNAL_ERROR:
-      err_msg = "Internal error of compiler";
+      err_msg = "InternalError";
+      break;
+    default:
+      err_msg = "UnknownError";
       break;
   }
   fprintf(stderr,RESET);

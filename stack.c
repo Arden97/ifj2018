@@ -55,7 +55,7 @@ void stack_print(ifj18_stack_t *s) {
   ifj18_token_t *tokend;
   stack_elem_t *tmp = s->top_ptr;
   while (s->top_ptr != NULL) {
-    printf("#STACK_SHIT:");
+    debug_info("#STACK_SHIT:");
     token_prettyprint((ifj18_token_t *)s->top_ptr->data);
     s->top_ptr = s->top_ptr->next_ptr;
   }
@@ -68,8 +68,8 @@ void stack_print_objects(ifj18_stack_t *s) {
   ifj18_token_t *tokend;
   stack_elem_t *tmp = s->top_ptr;
   while (s->top_ptr != NULL) {
-    printf("#STACK_SHIT Object:");
-    printf("%d\n",((ifj18_obj_t *)s->top_ptr->data)->obj_type.var.value.as_int);
+    debug_info("#STACK_SHIT Object:");
+    debug_info("%d\n",((ifj18_obj_t *)s->top_ptr->data)->obj_type.var.value.as_int);
     s->top_ptr = s->top_ptr->next_ptr;
   }
   s->top_ptr = tmp;
