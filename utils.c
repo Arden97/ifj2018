@@ -1,11 +1,5 @@
 #include "utils.h"
-#include <assert.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
+#define DEBUG
 /*
  * Return the filesize of `filename` or -1.
  */
@@ -57,4 +51,27 @@ char *read_until_eof(FILE *stream) {
   }
 
   return str;
+}
+
+
+void debug_info(const char *format, ...) {
+#ifdef DEBUG
+  va_list ap;
+  va_start (ap, format);
+  printf("%s# ", KGREY);
+  vprintf(format, ap);
+  printf("%s", RESET);
+  va_end (ap);
+#endif
+}
+
+void debug_info_unwrapped(const char *format, ...) {
+#ifdef DEBUG
+  va_list ap;
+  va_start (ap, format);
+  printf("%s", KGREY);
+  vprintf(format, ap);
+  printf("%s", RESET);
+  va_end (ap);
+#endif
 }

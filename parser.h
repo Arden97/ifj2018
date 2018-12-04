@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "expression.h"
 #include "prettyprint.h"
+#include "utils.h"
 
 int PROG();
 int DEFINE_FUNCTION();

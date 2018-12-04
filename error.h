@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils.h"
 
 #ifndef ifj_error
 
@@ -14,9 +15,6 @@
 #define DIVBYZERO_ERROR 9
 #define INTERNAL_ERROR 99
 
-#define KRED  "\x1B[31m"
-#define RESET "\033[0m"
-#define KBLU  "\x1B[34m"
 
 void error_msg(int error_code, char *details);
 void error(int error_code, char *details);
