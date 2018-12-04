@@ -18,6 +18,7 @@
 #define RESET "\033[0m"
 #define KBLU  "\x1B[34m"
 #define KGREY "\e[90m"
+#define KYEL "\e[33m"
 
 size_t file_size(FILE *handle);
 
@@ -28,4 +29,6 @@ char *read_until_eof(FILE *stream);
 void debug_info(const char *format, ...);
 void debug_info_unwrapped(const char *format, ...);
 
+void print_instruction(char *instruction, const char *format, ...);
+void print_instruction_no_args(char *instruction);
 #endif

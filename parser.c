@@ -2,9 +2,10 @@
 #include "semantics.h"
 
 int PROG() {
-    printf("CREATEFRAME\n");
-    printf("PUSHFRAME\n");
-    printf("DEFVAR LF@%s\n", FUNC_RETURN_VARNAME);
+    print_instruction_no_args("CREATEFRAME");
+    print_instruction_no_args("PUSHFRAME");
+    print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
+    print_instruction("DEFVAR", "LF@%s\n", COND_EXPR_RESULT_VARNAME);
     debug_info("start PROG\n");
     token_prettyprint(token);
     ifj18_obj_t *main_func = init_func();
@@ -72,27 +73,27 @@ int DEFINE_FUNCTION() {
         debug_info("parameters[%d] %s\n", i, parameters[i]->value);
     }
 
-    printf("JUMP ");
-    printf(FUNC_JUMP_AFTER_TEMPLATE, func_name);
+    print_instruction("JUMP", FUNC_JUMP_AFTER_TEMPLATE, func_name);
     printf("\n");
 
     debug_info("Function: %s, param count: %d\n", func_name, func->obj_type.func.params_num);
-    printf("LABEL");
-    printf(FUNCTION_LABEL_TEMPLATE, func_name);
+    print_instruction("LABEL", FUNCTION_LABEL_TEMPLATE, func_name);
     printf("\n");
 
-    printf("PUSHFRAME \n"
-           "DEFVAR LF@%s\n", FUNC_RETURN_VARNAME);
-    printf("MOVE LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
+    print_instruction_no_args("PUSHFRAME");
+
+    print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
+    print_instruction("DEFVAR", "LF@%s\n", COND_EXPR_RESULT_VARNAME);
+    print_instruction("MOVE", "LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
 
     for(int i=0; i<func->obj_type.func.params_num; i++){
         debug_info("parameters[%d] %s\n", i, parameters[i]->value);
-        printf("MOVE LF@%s LF@%%%d\n",parameters[i]->value, i+1);
+        print_instruction("MOVE", "LF@%s LF@%%%d\n",parameters[i]->value, i+1);
     }
 
     get_token();
 
-    debug_info("# Statements inside of function\n");
+    debug_info("Statements inside of function\n");
     int statement_token;
 
     while (1) {
@@ -110,10 +111,10 @@ int DEFINE_FUNCTION() {
 
     debug_info("End of function found\n");
 
-    printf("POPFRAME\nRETURN\n");
+    print_instruction_no_args("POPFRAME");
+    print_instruction_no_args("RETURN");
 
-    printf("LABEL");
-    printf(FUNC_JUMP_AFTER_TEMPLATE, func_name);
+    print_instruction("LABEL", FUNC_JUMP_AFTER_TEMPLATE, func_name);
     printf("\n");
 
     return 1;
@@ -134,11 +135,11 @@ int STATEMENT(ifj18_obj_t *func) {
             token_id_name = token->value->as_string->value;
             get_token();
             if (token->type == TOKEN_OP_ASSIGN) {
-                printf("DEFVAR LF@%s\n", token_id_name);
+                print_instruction("DEFVAR", "LF@%s\n", token_id_name);
                 debug_info("Sent LF@%s as variable to save expr\n", token_id_name);
                 get_token();
                 expression(func, token_id_name);
-                printf("MOVE LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
+                print_instruction("MOVE", "LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
             } else {
                 expression(func, FUNC_RETURN_VARNAME);
             }
