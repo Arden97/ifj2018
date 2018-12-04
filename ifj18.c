@@ -13,7 +13,7 @@ int main() {
     fprintf(stderr, "InternalError: Memory Allocation has failed\n");
     exit(99);
   }
-  get_token();
+  //get_token();
 
   global_table = ifj18_hash_new();
   init_list(garbage_list);

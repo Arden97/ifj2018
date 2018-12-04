@@ -72,7 +72,7 @@ static ifj18_token_t *scan_ident(int c) {
       if (0 == strcmp("print", buf)) return save_token(TOKEN_PRINT);
       break;
     case 6:
-      if (0 == strcmp("inputs", buf)) return save_token(TOKEN_INPUTS);  
+      if (0 == strcmp("inputs", buf)) return save_token(TOKEN_INPUTS);
       if (0 == strcmp("inputf", buf)) return save_token(TOKEN_INPUTF);
       if (0 == strcmp("inputi", buf)) return save_token(TOKEN_INPUTI);
       if (0 == strcmp("length", buf)) return save_token(TOKEN_LENGTH);
