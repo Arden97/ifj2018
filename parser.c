@@ -116,7 +116,7 @@ int STATEMENT(ifj18_obj_t *func) {
             get_token();
             if (token->type == TOKEN_OP_ASSIGN) {
                 printf("DEF LF@%s\n", token_id_name);
-//                expression(func, token_id_name);
+                expression(func, token_id_name);
                 printf("#Sent LF@%s as variable to save expr\n", token_id_name);
                 printf("MOV LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
             }
