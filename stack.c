@@ -1,11 +1,14 @@
 #include "stack.h"
 #include "error.h"
+#include "scanner.h"
 #include <stdio.h>
+#include "prettyprint.h"
+#include "semantics.h"
 #include <stdlib.h>
-
+#define DEBUG
 ifj18_stack_t *stack_init() {
   ifj18_stack_t *s;
-  if (!(s = (ifj18_stack_t *)malloc(sizeof(ifj18_stack_t))))
+  if ((s = (ifj18_stack_t *)malloc(sizeof(ifj18_stack_t))) == NULL)
     error(INTERNAL_ERROR, "stack memory allocation");
   s->top_ptr = NULL;
   return s;
@@ -49,9 +52,24 @@ void stack_copy(ifj18_stack_t *dst_stack, ifj18_stack_t *src_stack) {
 void stack_print(ifj18_stack_t *s) {
   (void)s;
 #ifdef DEBUG
+  ifj18_token_t *tokend;
   stack_elem_t *tmp = s->top_ptr;
   while (s->top_ptr != NULL) {
-    printf("%d\n", *((int *)s->top_ptr->data));
+    printf("#STACK_SHIT:");
+    token_prettyprint((ifj18_token_t *)s->top_ptr->data);
+    s->top_ptr = s->top_ptr->next_ptr;
+  }
+  s->top_ptr = tmp;
+#endif
+}
+void stack_print_objects(ifj18_stack_t *s) {
+  (void)s;
+#ifdef DEBUG
+  ifj18_token_t *tokend;
+  stack_elem_t *tmp = s->top_ptr;
+  while (s->top_ptr != NULL) {
+    printf("#STACK_SHIT Object:");
+    printf("%d\n",((ifj18_obj_t *)s->top_ptr->data)->obj_type.var.value.as_int);
     s->top_ptr = s->top_ptr->next_ptr;
   }
   s->top_ptr = tmp;

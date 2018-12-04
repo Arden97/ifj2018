@@ -4,6 +4,7 @@
 #include "stack.h"
 #include "strlib.h"
 #include "symtable.h"
+#include "prettyprint.h"
 
 int inputf();
 int inputi();
