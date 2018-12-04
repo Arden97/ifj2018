@@ -20,3 +20,4 @@ int parse_print();
 int parse_inputf();
 int parse_inputs();
 int parse_inputi();
+void PARSE_FUNCTION_CALL();

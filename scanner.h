@@ -100,11 +100,12 @@ void check_arg(int required_type, char id_allowed);
 void check_token_type_msg(int required_type, int error_type, int inv, char *message);
 
 #define FUNC_RETURN_VARNAME "$$_retval"
-
+#define FUNC_JUMP_AFTER_TEMPLATE "$$__%s_after__$$"
+#define FUNCTION_LABEL_TEMPLATE "$__%s"
 /*
  * INTERNAL FUNCTION $__name
- * INTERNAL VARIABLE $$_name
- * INTERNAL LABEL $$_name_$$
+ * INTERNAL VARIABLE $$__name
+ * INTERNAL LABEL $$__name__$$
  */
 
 #endif /* IFJ18_TOKEN_H */
