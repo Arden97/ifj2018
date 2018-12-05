@@ -13,17 +13,17 @@ int inputi();
 
 int inputs();
 
-int length();
+void length();
 
-int substr();
+void substr();
 
-int ord();
+void ord();
 
 int expression(ifj18_obj_t *func, char *ret_var);
 
 int is_function();
 
-int function(ifj18_obj_t *act_function);
+int function(ifj18_obj_t *act_function, char *ret_var);
 
 int inf_to_post(ifj18_obj_t *act_function, char *ret_var);
 
