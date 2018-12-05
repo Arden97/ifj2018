@@ -1,7 +1,7 @@
 a = 5
-while a == 1
+while a != 1
   a = a - 1
-  if 1 < 2
+  if 1 < 2 then
     print(2)
   else
     print(1)
