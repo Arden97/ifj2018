@@ -1,7 +1,7 @@
 #include "utils.h"
 
-//#define DEBUG
-//#define COLORIFY
+#define DEBUG
+#define COLORIFY
 
 /*
  * Return the filesize of `filename` or -1.

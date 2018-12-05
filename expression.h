@@ -26,6 +26,7 @@ int is_function();
 int function(ifj18_obj_t *act_function, char *ret_var);
 
 int inf_to_post(ifj18_obj_t *act_function, char *ret_var);
+int post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var, int operations_count);
 
 ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function);
 

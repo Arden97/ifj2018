@@ -141,8 +141,15 @@ int STATEMENT(ifj18_obj_t *func) {
                     print_instruction("DEFVAR", "LF@%s\n", token_id_name);
                     debug_info("Sent LF@%s as variable to save expr\n", token_id_name);
                     get_token();
-                    expression(func, token_id_name);
+                    int type = expression(func, token_id_name);
                     print_instruction("MOVE", "LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
+                    ifj18_obj_t *obj =  init_var();
+                    obj->obj_type.var.type = type;
+                    obj->obj_type.var.var_name = token_id_name;
+
+                    ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token_id_name, obj);
+                    fprintf(stderr, "hash_has: %d\na", ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token_id_name));
+                    fprintf(stderr, "token: %s\n", token_id_name);
                 } else {
                     expression(func, FUNC_RETURN_VARNAME);
                 }

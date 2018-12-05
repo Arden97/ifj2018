@@ -3,7 +3,6 @@
 
 void token_prettyprint(ifj18_token_t *token) {
   debug_info("%sTOKEN:", KBLU);
-#ifdef DEBUG
   switch (token->type) {
   case TOKEN_INT:
     debug_info_unwrapped(" %d", token->value->as_int);
@@ -23,5 +22,4 @@ void token_prettyprint(ifj18_token_t *token) {
   }
   debug_info_unwrapped("%s", RESET);
   debug_info_unwrapped("\n");
-#endif
 }

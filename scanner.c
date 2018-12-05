@@ -12,6 +12,7 @@ void init_token() {
 ifj18_token_t *save_token(ifj18_token type) {
   token->type = type; // assign the type
   token->len = token->value->as_string->length;
+
   return token;
 }
 
