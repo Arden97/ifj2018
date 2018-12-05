@@ -1,6 +1,6 @@
 #include "utils.h"
 
-//#define DEBUG
+#define DEBUG
 #define COLORIFY
 
 /*

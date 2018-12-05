@@ -1,8 +1,8 @@
 #include "error.h"
-#include "gc.h"
-#include "utils.h"
 
-void error_msg(int error_code, char *details){
+
+
+char  *error_msg(int error_code){
   char *err_msg;
   switch(error_code){
     case LEXICAL_ERROR:
@@ -40,13 +40,24 @@ void error_msg(int error_code, char *details){
       err_msg = "UnknownError";
       break;
   }
-  fprintf(stderr,RESET);
-  printf(RESET);
-  fprintf(stderr, "%s%s. Message:  %s\n%s", KRED,err_msg, details,RESET);
+//  fprintf(stderr,RESET);
+//  printf(RESET);
+//  fprintf(stderr, "%s%s. Message:  %s\n%s", KRED,err_msg, details,RESET);
+
+  return err_msg;
 }
 
-void error(int error_code, char *details){
-  error_msg(error_code, details);
+void error(int error_code, const char *format, ...){
+    fprintf(stderr,RESET);
+    printf(RESET);
+    fprintf(stderr, "%s%s. ", KRED,error_msg(error_code));
+
+    va_list ap;
+    va_start (ap, format);
+    vfprintf(stderr, format, ap);
+    va_end (ap);
+
+    fprintf(stderr, "%s", RESET);
 //  gc_dispose();
   exit(error_code);
 }

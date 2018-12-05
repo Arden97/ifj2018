@@ -91,7 +91,7 @@ static int hex_literal() {
   int a = hex(fgetc(stdin));
   int b = hex(fgetc(stdin));
   if (a > -1 && b > -1) return a << 4 | b;
-  error_msg(SYNTAX_ERROR, "string hex literal \\x contains invalid digits");
+  error(SYNTAX_ERROR, "string hex literal \\x contains invalid digits");
   return -1;
 }
 
@@ -151,7 +151,7 @@ static ifj18_token_t *scan_number(int c) {
   switch (c = fgetc(stdin)) {
     case 'x':
       if (!isxdigit(c = fgetc(stdin))) {
-        error_msg(SYNTAX_ERROR, "hex literal expects one or more digits");
+        error(SYNTAX_ERROR, "hex literal expects one or more digits");
         return 0;
       } else {
         do n = n << 4 | hex(c);
@@ -234,23 +234,35 @@ ifj18_token_t *get_token() {
     case '*': return save_token(TOKEN_OP_MUL);
     case '/': return save_token(TOKEN_OP_DIV);
     case -1: return save_token(TOKEN_END_OF_FILE);
-    case '!': return '=' == (c = fgetc(stdin)) ? save_token(TOKEN_OP_NEQ) : (ungetc(c, stdin), save_token(TOKEN_OP_NOT));
+    case '!':
+      if('=' == (c = fgetc(stdin))){
+        return save_token(TOKEN_OP_NEQ);
+      }
+      else{
+        error(LEXICAL_ERROR, "Unknown token");
+      }
     case '=': return '=' == (c = fgetc(stdin)) ? save_token(TOKEN_OP_EQ) : (ungetc(c, stdin), save_token(TOKEN_OP_ASSIGN));
     case '&':
       switch (c = fgetc(stdin)) {
         case '&':
           return save_token(TOKEN_OP_AND);
+        default:
+          error(LEXICAL_ERROR, "Unknown token");
       }
     case '|':
       switch (c = fgetc(stdin)) {
         case '|':
           return save_token(TOKEN_OP_OR);
+        default:
+          error(LEXICAL_ERROR, "Unknown token");
       }
     case '<':
       switch (c = fgetc(stdin)) {
         case '=': return save_token(TOKEN_OP_LTE);
         default: return ungetc(c, stdin), save_token(TOKEN_OP_LT);
+
       }
+
     case '>':
       switch (c = fgetc(stdin)) {
         case '=': return save_token(TOKEN_OP_GTE);
@@ -270,7 +282,7 @@ ifj18_token_t *get_token() {
     default:
       if (isalpha(c) || '_' == c) return scan_ident(c);
       if (isdigit(c) || '.' == c) return scan_number(c);
-      error_msg(LEXICAL_ERROR, "illegal character");
+      error(LEXICAL_ERROR, "illegal character");
       return save_token(TOKEN_ILLEGAL);
   }
 }
