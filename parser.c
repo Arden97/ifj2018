@@ -2,6 +2,7 @@
 #include "semantics.h"
 
 int PROG() {
+    print_instruction_no_args(".IFJcode18")
     print_instruction_no_args("CREATEFRAME");
     print_instruction_no_args("PUSHFRAME");
     print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
