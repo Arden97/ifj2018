@@ -220,6 +220,16 @@ void print_operation_operand(ifj18_obj_t *operand, char *prefix, int type){
     }
 }
 
+void convert_operand(ifj18_obj_t *operand){
+    debug_info("Convert operand: %s\n", operand->obj_type.var.var_name);
+    if (strlen(operand->obj_type.var.var_name) != 0) {
+        print_instruction("INT2FLOAT", "LF@%s LF@%s\n", TEMP_EXP_CONVERTION_VARNAME, operand->obj_type.var.var_name);
+    }
+    else{
+        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXP_CONVERTION_VARNAME, operand->obj_type.var.value.as_int);
+    }
+}
+
 
 
 void generate_3ac_expressions(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_obj_t *operand_2,
@@ -238,12 +248,11 @@ void generate_3ac_expressions(char *prefix_1, ifj18_obj_t *operand_1, char *pref
 
     debug_info("Explicit type: %d\n", type);
     if(type1 != type){
-        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXP_CONVERTION_VARNAME, operand_1->obj_type.var.value.as_int);
-
         flag1 =  1;
+        convert_operand(operand_1);
     }
     else if(type2 != type){
-        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXP_CONVERTION_VARNAME, operand_2->obj_type.var.value.as_int);
+        convert_operand(operand_2);
         flag2 = 1;
     }
 
@@ -251,20 +260,21 @@ void generate_3ac_expressions(char *prefix_1, ifj18_obj_t *operand_1, char *pref
 
     print_instruction(operation,"LF@%s ", tmp_var_obj->obj_type.var.var_name);
 
-    if(flag1){
-        printf("LF@%s", TEMP_EXP_CONVERTION_VARNAME);
-    }
-    else{
-        print_operation_operand(operand_1, prefix_1, type1);
-    }
-
-    printf(" ");
 
     if(flag2){
         printf("LF@%s", TEMP_EXP_CONVERTION_VARNAME);
     }
     else{
         print_operation_operand(operand_2, prefix_2, type2);
+    }
+    printf(" ");
+
+
+    if(flag1){
+        printf("LF@%s", TEMP_EXP_CONVERTION_VARNAME);
+    }
+    else{
+        print_operation_operand(operand_1, prefix_1, type1);
     }
 
     printf("\n");
