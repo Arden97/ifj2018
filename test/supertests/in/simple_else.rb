@@ -1,4 +1,4 @@
-if 2 > 1
+if 2 > 1 then
   print(2)
 else
   print(1)
