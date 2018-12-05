@@ -146,9 +146,6 @@ int STATEMENT(ifj18_obj_t *func) {
                     obj->obj_type.var.var_name = token_id_name;
 
                     ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token_id_name, obj);
-                    fprintf(stderr, "hash_has: %d\na",
-                            ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token_id_name));
-                    fprintf(stderr, "token: %s\n", token_id_name);
                 } else {
                     expression(func, FUNC_RETURN_VARNAME);
                 }
@@ -246,6 +243,7 @@ void PARSE_PRINT(ifj18_obj_t *func) {
     }
 
 }
+
 
 void PARSE_IF(ifj18_obj_t *func) {
     static int if_count = 0;
