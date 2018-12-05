@@ -274,6 +274,7 @@ switch (type) {
 
   default: return 0;
 }
+}
 
 void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var) {
     // stack_print(postfix_stack);
