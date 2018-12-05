@@ -27,12 +27,12 @@
 	t(PRINT, "print") \
 	t(WHILE, "while") \
 	t(THEN, "then") \
-	t(OP_PLUS, "+") \
-	t(OP_MINUS, "-") \
-	t(OP_MUL, "*") \
-	t(OP_DIV, "/") \
-	t(OP_LT, "<") \
-	t(OP_GT, ">") \
+	t(OP_PLUS, "ADD") \
+	t(OP_MINUS, "SUB") \
+	t(OP_MUL, "MUL") \
+	t(OP_DIV, "DIV") \
+	t(OP_LT, "LT") \
+	t(OP_GT, "GT") \
 	t(OP_LTE, "<=") \
 	t(OP_GTE, ">=") \
 	t(OP_ASSIGN, "=") \
@@ -49,7 +49,7 @@
   t(COMMA, ",") \
   t(OP_DOT, ".") \
 	t(SUBSTR, "substr") \
-  t(OP_EQ, "==") \
+  t(OP_EQ, "EQ") \
 	t(ORD, "ord") \
   t(OP_AND, "&&") \
   t(OP_OR, "||") \
@@ -113,6 +113,7 @@ void check_token_type_msg(int required_type, int error_type, int inv, char *mess
 
 
 #define TEMP_EXPRESSION_VARNAME "$$__tmp_val"
+#define TEMP_EXP_CONVERTION_VARNAME "$$__tmp_val_convert"
 
 
 #define COND_EXPR_RESULT_VARNAME "$$__expr_res"

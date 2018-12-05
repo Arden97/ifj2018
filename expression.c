@@ -36,6 +36,8 @@ char precedence_table[16][16] = {
         /*  $  */
                   {'<', '<', '<', '<', '<', ' ', '<', '<', '<', '<', '<', '<', '<', '<', '<', ' '},
 };
+
+
 char flags[4] = {0, 0, 0, 0};
 #define FG_LENGTH 0
 #define FG_INPUTI 1
@@ -124,25 +126,6 @@ int function(ifj18_obj_t *act_function) {
     printf("CALL %s\n", key);
 }
 
-int length() {
-    get_token();
-
-    check_token_type(TOKEN_LPAREN, SYNTAX_ERROR, 1);
-
-    get_token();
-
-    check_arg(TOKEN_STRING, 1);
-
-    printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
-}
-
-
-void print_length() {
-    if (!flags[FG_LENGTH] && flags[FG_LENGTH]++) {
-        printf("LABEL $_length\nPUSHFRAME\nSTRLEN GF@$_stack_temp LF@$_arg_0\nPUSHS GF@$_stack_temp\nPOPFRAME\nRETURN\n\n");
-    }
-    printf("%d", flags[FG_LENGTH]);
-}
 
 int shift_to_stack(ifj18_token_t *stack_token) {
 
@@ -224,6 +207,7 @@ void print_operation_operand(ifj18_obj_t *operand, char *prefix, int type){
         prefix = "LF";
         printf("%s@%s", prefix, operand->obj_type.var.var_name);
 
+
     }
     else{
         if(type == IFJ18_TYPE_INT){
@@ -238,8 +222,9 @@ void print_operation_operand(ifj18_obj_t *operand, char *prefix, int type){
 
 
 
-void check_if_var(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_obj_t *operand_2, ifj18_obj_t *tmp_var_obj,
-             ifj18_var type1, ifj18_var type2) {
+void generate_3ac_expressions(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_obj_t *operand_2,
+                              ifj18_obj_t *tmp_var_obj,
+                              ifj18_var type1, ifj18_var type2, char *operation,  int operations_count) {
 
 
     int flag1 = 0, flag2 = 0, type=0;
@@ -253,21 +238,21 @@ void check_if_var(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_
 
     debug_info("Explicit type: %d\n", type);
     if(type1 != type){
-        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
+        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXP_CONVERTION_VARNAME, operand_1->obj_type.var.value.as_int);
 
         flag1 =  1;
     }
     else if(type2 != type){
-        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
+        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXP_CONVERTION_VARNAME, operand_2->obj_type.var.value.as_int);
         flag2 = 1;
     }
 
 
 
-    print_instruction("ADD","LF@%s ", tmp_var_obj->obj_type.var.var_name);
+    print_instruction(operation,"LF@%s ", tmp_var_obj->obj_type.var.var_name);
 
     if(flag1){
-        printf("LF@%s", TEMP_EXPRESSION_VARNAME);
+        printf("LF@%s", TEMP_EXP_CONVERTION_VARNAME);
     }
     else{
         print_operation_operand(operand_1, prefix_1, type1);
@@ -276,7 +261,7 @@ void check_if_var(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_
     printf(" ");
 
     if(flag2){
-        printf("LF@%s", TEMP_EXPRESSION_VARNAME);
+        printf("LF@%s", TEMP_EXP_CONVERTION_VARNAME);
     }
     else{
         print_operation_operand(operand_2, prefix_2, type2);
@@ -284,22 +269,15 @@ void check_if_var(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_
 
     printf("\n");
 
-    tmp_var_obj->obj_type.var.type = type1 == IFJ18_TYPE_FLOAT || type2 == IFJ18_TYPE_FLOAT;
+    tmp_var_obj->obj_type.var.type = type;
+
+    debug_info("tmpvar Type:%d\n", tmp_var_obj->obj_type.var.type);
 
 
 
 }
 
-int convert_token_type(ifj18_token_t *token_d) {
-    switch (token_d->type) {
-        case TOKEN_FLOAT:
-            return IFJ18_TYPE_FLOAT;
-        case TOKEN_INT:
-            return IFJ18_TYPE_INT;
-        default:
-            error(INTERNAL_ERROR, "Unknown type\n");
-    }
-}
+
 
 void set_object_value(ifj18_token_t *token_d, ifj18_obj_t *func, ifj18_stack_t *stack) {
     ifj18_obj_t *var;
@@ -345,14 +323,18 @@ char *get_bytecode_objtype(ifj18_obj_t *operand) {
 }
 
 
-void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var) {
+void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var, int operations_count) {
     // stack_print(postfix_stack);
     // printf("-----------\n");
     ifj18_stack_t *output_stack = stack_init();
-    ifj18_obj_t *tmp_var_obj = init_var();
-    tmp_var_obj->obj_type.var.var_name = TEMP_EXPRESSION_VARNAME;
+    stack_print(postfix_stack);
+    char blad[100];
 
     while (!stack_empty(postfix_stack)) {
+
+        ifj18_obj_t *tmp_var_obj = init_var();
+        sprintf(tmp_var_obj->obj_type.var.var_name, "%s_%d", TEMP_EXPRESSION_VARNAME, operations_count);
+
         ifj18_token_t *act_token = stack_top(postfix_stack);
         stack_pop(postfix_stack);
 
@@ -364,16 +346,26 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
             ifj18_obj_t *operand_2 = stack_top(output_stack);
             stack_pop(output_stack);
 
+            stack_print(postfix_stack);
+            stack_print_objects(output_stack);
 
             char *prefix_1 = get_bytecode_objtype(operand_1);
             char *prefix_2 = get_bytecode_objtype(operand_2);
 
+            char *operation;
 
-            check_if_var(prefix_1, operand_1, prefix_2,
-                    operand_2, tmp_var_obj, operand_1->obj_type.var.type, operand_2->obj_type.var.type);
+            operation = (char *) ifj18_token_type_string(act_token->type);
 
 
+            generate_3ac_expressions(prefix_1, operand_1, prefix_2,
+                                     operand_2, tmp_var_obj, operand_1->obj_type.var.type, operand_2->obj_type.var.type,
+                                     operation, operations_count);
 
+            operations_count--;
+
+            debug_info("Operations_count = %d\n", operations_count);
+
+            debug_info("Stack push: %s\n", tmp_var_obj->obj_type.var.var_name);
             stack_push(output_stack, tmp_var_obj);
         }
 
@@ -381,21 +373,9 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
     }
     stack_pop(output_stack);
 
-//    if (!stack_empty(output_stack)) {
-//        debug_info("###### dddd\n");
-//        ifj18_obj_t *only_operand = stack_top(output_stack);
-//        stack_pop(output_stack);
-//        if (only_operand->obj_type.var.type == IFJ18_TYPE_INT) {
-//            printf("MOV LF@%s int@%d\n", ret_var, only_operand->obj_type.var.value.as_int);
-//        } else if (only_operand->obj_type.var.type == IFJ18_TYPE_FLOAT) {
-//            printf("MOV LF@%s float@%f\n", ret_var, only_operand->obj_type.var.value.as_float);
-//        } else if (strlen(only_operand->obj_type.var.var_name) != 0) {
-//            printf("MOV LF@%s LF@%s\n", ret_var, only_operand->obj_type.var.var_name);
-//        }
-//    } else {
+
         print_instruction("MOVE", "LF@%s LF@%s\n", ret_var, TEMP_EXPRESSION_VARNAME);
-//    }
-//    debug_info("######\n");
+
 }
 
 int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
@@ -403,6 +383,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
 
     unsigned count_of_bracket = 0;
     int sum_count = 1;
+    int operatiobs_ocount = 0;
 
     ifj18_stack_t *output_stack = stack_init();
     ifj18_stack_t *infix_stack = stack_init();
@@ -438,6 +419,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
                  token->type == TOKEN_OP_ASSIGN || token->type == TOKEN_OP_NEQ) {
 
             sum_count++;
+            operatiobs_ocount++;
             stack_token = stack_top(infix_stack);
             psa_operation(infix_stack, output_stack, stack_token);
         }
@@ -458,8 +440,9 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
     if (count_of_bracket || sum_count)
         error(SYNTAX_ERROR, "error while parsing expressions");
 
+    debug_info("sumcum: %d", operatiobs_ocount);
     /// generating instruction
-    post_to_instr(infix_stack, act_function, ret_var);
+    post_to_instr(infix_stack, act_function, ret_var, operatiobs_ocount);
 }
 
 ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
