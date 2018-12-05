@@ -2,21 +2,20 @@
 
 #define IFJ18_UTIL_H
 
-#include <sys/stat.h>
-#include <stddef.h>
-#include <stdio.h>
 #include "utils.h"
 #include <assert.h>
 #include <fcntl.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
-#include <stdarg.h>
 
-
-#define KRED  "\x1B[31m"
+#define KRED "\x1B[31m"
 #define RESET "\033[0m"
-#define KBLU  "\x1B[34m"
+#define KBLU "\x1B[34m"
 #define KGREY "\e[90m"
 #define KYEL "\e[33m"
 

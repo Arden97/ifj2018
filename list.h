@@ -1,14 +1,14 @@
-typedef struct tListElement{
-    void *val;
-    struct tListElement *lptr;
-    struct tListElement *rptr;
+typedef struct tListElement {
+  void *val;
+  struct tListElement *lptr;
+  struct tListElement *rptr;
 
-} *tListElementPtr;
+} * tListElementPtr;
 
-typedef struct tList{
-    tListElementPtr First;
-    tListElementPtr Last;
-    tListElementPtr Active;
+typedef struct tList {
+  tListElementPtr First;
+  tListElementPtr Last;
+  tListElementPtr Active;
 } tList;
 
 void *copy_last(tList *L);
