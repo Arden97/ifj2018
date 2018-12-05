@@ -1,0 +1,17 @@
+{
+  "items": [{
+    "name": "token_str",
+    "input": "assign.rb",
+    "output": "25\n0\n",
+    "type": "file",
+    "expected":"error"
+  },
+  {
+    "name": "token_lambda",
+    "input": "Bye!",
+    "output": "25\n1\n",
+    "type": "string",
+    "expected":"success"
+  }],
+  "basepatH":"supertests/in"
+}
