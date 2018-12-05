@@ -9,6 +9,7 @@ ifj18_obj_t *init_var() {
   }
 
   var->type = IFJ18_TYPE_NULL;
+  var->var_name = (char *)malloc(20);
 
   ifj18_obj_t *obj_var = (ifj18_obj_t *)malloc(sizeof(ifj18_obj_t));
   obj_var->obj_type.var = *var;

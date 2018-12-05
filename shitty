@@ -10,5 +10,6 @@
 #s1 = inputs
 #end
 #
-def asd a,b
-end
+#def asd a,b
+#end
+a = 1 + 1.0

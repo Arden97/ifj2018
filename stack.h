@@ -17,5 +17,5 @@ void *stack_top(ifj18_stack_t *s);
 int stack_empty(ifj18_stack_t *s);
 void stack_print(ifj18_stack_t *s);
 void stack_copy(ifj18_stack_t *dst_stack, ifj18_stack_t *src_stack);
-
+void stack_print_objects(ifj18_stack_t *s);
 #endif // STACK_Hifj18_
