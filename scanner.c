@@ -1,12 +1,5 @@
-#include "error.h"
 #include "scanner.h"
-#include <ctype.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include "strlib.h"
+
 
 void init_token() {
   token = malloc(sizeof(ifj18_token_t));
@@ -135,7 +128,7 @@ static ifj18_token_t *scan_string() {
  */
 
 static ifj18_token_t *scan_number(int c) {
-  int n = 0, type = 0, expo = 0, e;
+  int n = 0, type = 0, expo = 0, e = 0;
   int expo_type = 1;
   /* expo_type:
    * 1 -> '+'(default)
@@ -207,10 +200,10 @@ static ifj18_token_t *scan_number(int c) {
     ungetc(c, stdin);
     if (expo_type == 0) expo *= -1;
     if (type == 0) {
-      token->value->as_int = n * pow(10, expo);
+      token->value->as_int = (int) (n * pow(10, expo));
       return save_token(TOKEN_INT);
     } else {
-      token->value->as_float = ((float) n / e) * pow(10, expo);
+      token->value->as_float = (float) (((float) n / e) * pow(10, expo));
       return save_token(TOKEN_FLOAT);
     }
   }
