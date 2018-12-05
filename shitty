@@ -12,4 +12,8 @@
 #
 #def asd a,b
 #end
-a = 1 + 1.0
+if 1>2 then
+1
+else
+2
+end

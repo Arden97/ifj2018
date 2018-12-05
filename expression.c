@@ -179,7 +179,6 @@ void psa_operation(ifj18_stack_t *operators_stack, ifj18_stack_t *output_stack, 
 }
 
 
-
 void print_operation_operand(ifj18_obj_t *operand, char *prefix, int type) {
     if (strlen(operand->obj_type.var.var_name) != 0) {
         prefix = "LF";
@@ -251,8 +250,7 @@ void set_object_value(ifj18_token_t *token_d, ifj18_obj_t *func, ifj18_stack_t *
     ifj18_obj_t *var;
     if (token_d->type == TOKEN_ID) {
         var = find_var(token_d, func);
-    }
-    else {
+    } else {
         var = init_var();
     }
 
@@ -287,7 +285,7 @@ char *get_bytecode_objtype(ifj18_obj_t *operand) {
 }
 
 int post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var, int operations_count) {
-     stack_print(postfix_stack);
+    stack_print(postfix_stack);
     // printf("-----------\n");
     int while_opened = 0;
     int type;
@@ -348,27 +346,30 @@ int post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char 
         }
     }
 
+
     if (!while_opened && operations_count == 0) {
+        print_instruction("DEFVAR", "LF@%s\n", TEMP_EXPRESSION_VARNAME);
         ifj18_token_t *act_token = stack_top(postfix_stack);
         stack_pop(postfix_stack);
         switch (act_token->type) {
             case TOKEN_STRING:
-                print_instruction("MOVE", "LF@%s_%d string@%s\n", TEMP_EXPRESSION_VARNAME, operations_count + 1,
+                print_instruction("MOVE", "LF@%s string@%s\n", TEMP_EXPRESSION_VARNAME,
                                   act_token->value->as_string->value);
                 type = IFJ18_TYPE_STRING;
                 break;
             case TOKEN_ID:
-                print_instruction("MOVE", "LF@%s_%d LF@%s\n", TEMP_EXPRESSION_VARNAME, operations_count + 1,
+                print_instruction("MOVE", "LF@%s LF@%s\n", TEMP_EXPRESSION_VARNAME,
                                   act_token->value->as_string->value);
-                type = ifj18_hash_get(act_function->obj_type.func.local_symtable, act_token->value->as_string->value)->obj_type.var.type;
+                type = ifj18_hash_get(act_function->obj_type.func.local_symtable,
+                                      act_token->value->as_string->value)->obj_type.var.type;
                 break;
             case TOKEN_INT:
-                print_instruction("MOVE", "LF@%s_%d int@%d\n", TEMP_EXPRESSION_VARNAME, operations_count + 1,
+                print_instruction("MOVE", "LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME,
                                   act_token->value->as_int);
                 type = IFJ18_TYPE_INT;
                 break;
             case TOKEN_FLOAT:
-                print_instruction("MOVE", "LF@%s_%d float@%f\n", TEMP_EXPRESSION_VARNAME, operations_count + 1,
+                print_instruction("MOVE", "LF@%s float@%f\n", TEMP_EXPRESSION_VARNAME,
                                   act_token->value->as_float);
                 type = IFJ18_TYPE_FLOAT;
                 break;
@@ -380,7 +381,14 @@ int post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char 
     //    stack_pop(output_stack);
 
     print_instruction_no_args("POPFRAME");
-    print_instruction("MOVE", "LF@%s TF@%s_1\n", ret_var, TEMP_EXPRESSION_VARNAME, operations_count + 1);
+    if (!while_opened && operations_count == 0) {
+        print_instruction("MOVE", "LF@%s TF@%s\n", ret_var, TEMP_EXPRESSION_VARNAME);
+
+    }
+    else {
+        print_instruction("MOVE", "LF@%s TF@%s_1\n", ret_var, TEMP_EXPRESSION_VARNAME, operations_count + 1);
+
+    }
     return type;
 }
 
@@ -430,7 +438,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
             psa_operation(infix_stack, output_stack, stack_token);
         }
         debug_info("TOKEN PRETTY SPRINT\n");
-                token_prettyprint(token);
+        token_prettyprint(token);
         get_token();
 
     }
@@ -461,7 +469,8 @@ ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
         ifj18_obj_t *found = ifj18_hash_get((kh_value_t *) act_function->obj_type.func.local_symtable,
                                             find_token->value->as_string->value);
         /// we did not find
-        if (!ifj18_hash_has((kh_value_t *) act_function->obj_type.func.local_symtable, find_token->value->as_string->value)) {
+        if (!ifj18_hash_has((kh_value_t *) act_function->obj_type.func.local_symtable,
+                            find_token->value->as_string->value)) {
             error(SEMANTIC_ERROR, "\n");
         }
 

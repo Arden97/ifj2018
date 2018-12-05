@@ -16,6 +16,8 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters);
 // int NEXT_PARAM();
 // int parse_id();
 void PARSE_IF();
+
+void PARSE_PRINT(ifj18_obj_t *func);
 // int parse_while();
 // int parse_print();
 // int parse_inputf();

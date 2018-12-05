@@ -19,18 +19,16 @@ int PROG() {
                 continue;
             case TOKEN_END:
                 error(SYNTAX_ERROR, "Closing tag end without matching opening one. Expected end. Got: %s",
-                        ifj18_token_type_string(token->type));
+                      ifj18_token_type_string(token->type));
             case TOKEN_ELSE:
                 error(SYNTAX_ERROR, "Unpexpected else");
             default:
                 statement_return = STATEMENT(main_func);
                 if (statement_return == TOKEN_END_OF_FILE) {
                     return 1;
-                }
-                else if(statement_return == TOKEN_DEF){
+                } else if (statement_return == TOKEN_DEF) {
                     continue;
-                }
-                else{
+                } else {
                     error(SYNTAX_ERROR, "Unexpected instruction: %s", ifj18_token_type_string(token->type));
                 }
                 break;
@@ -79,7 +77,7 @@ int DEFINE_FUNCTION() {
 
     PARAM_LIST(func, paren_found, parameters);
 
-    for(int i=0; i<func->obj_type.func.params_num; i++){
+    for (int i = 0; i < func->obj_type.func.params_num; i++) {
         debug_info("parameters[%d] %s\n", i, parameters[i]->value);
     }
 
@@ -96,16 +94,16 @@ int DEFINE_FUNCTION() {
     print_instruction("DEFVAR", "LF@%s\n", COND_EXPR_RESULT_VARNAME);
     print_instruction("MOVE", "LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
 
-    for(int i=0; i<func->obj_type.func.params_num; i++){
+    for (int i = 0; i < func->obj_type.func.params_num; i++) {
         debug_info("parameters[%d] %s\n", i, parameters[i]->value);
-        print_instruction("MOVE", "LF@%s LF@%%%d\n",parameters[i]->value, i+1);
+        print_instruction("MOVE", "LF@%s LF@%%%d\n", parameters[i]->value, i + 1);
     }
 
     get_token();
 
     debug_info("Statements inside of function\n");
 
-    if (STATEMENT(func) != TOKEN_END){
+    if (STATEMENT(func) != TOKEN_END) {
         error(SYNTAX_ERROR, "Unterminated function declaration");
     }
 
@@ -128,7 +126,7 @@ int STATEMENT(ifj18_obj_t *func) {
     token_prettyprint(token);
     char *token_id_name;
     char if_complete = 0;
-    while(1){
+    while (1) {
         switch (token->type) {
             case TOKEN_END_OF_FILE:
                 return TOKEN_END_OF_FILE;
@@ -143,12 +141,13 @@ int STATEMENT(ifj18_obj_t *func) {
                     get_token();
                     int type = expression(func, token_id_name);
                     print_instruction("MOVE", "LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
-                    ifj18_obj_t *obj =  init_var();
+                    ifj18_obj_t *obj = init_var();
                     obj->obj_type.var.type = type;
                     obj->obj_type.var.var_name = token_id_name;
 
                     ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token_id_name, obj);
-                    fprintf(stderr, "hash_has: %d\na", ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token_id_name));
+                    fprintf(stderr, "hash_has: %d\na",
+                            ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token_id_name));
                     fprintf(stderr, "token: %s\n", token_id_name);
                 } else {
                     expression(func, FUNC_RETURN_VARNAME);
@@ -161,7 +160,8 @@ int STATEMENT(ifj18_obj_t *func) {
                 return TOKEN_DEF;
             case TOKEN_WHILE:
             case TOKEN_PRINT:
-                return 0;
+                PARSE_PRINT(func);
+                break;
             case TOKEN_END:
                 return TOKEN_END;
             case TOKEN_ELSE:
@@ -176,31 +176,121 @@ int STATEMENT(ifj18_obj_t *func) {
     }
 
 }
-void PARSE_IF(ifj18_obj_t *func){
+
+char *get_3ac_token_type() {
+    switch (token->type) {
+        case TOKEN_STRING:
+            return "string";
+        case TOKEN_INT:
+            return "int";
+        case TOKEN_ID:
+            return "LF";
+        case TOKEN_FLOAT:
+            return "float";
+    }
+}
+
+
+void PARSE_PRINT(ifj18_obj_t *func) {
+    int param_found = 0;
+    int param_count = 0;
+    get_token();
+
+    if (token->type == TOKEN_LPAREN) {
+        param_found = 1;
+        get_token();
+    }
+
+    while (1) {
+        param_count++;
+        if (!param_found && token->type == TOKEN_RPAREN) {
+            error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
+        } else if ((param_found && token->type == TOKEN_RPAREN)) {
+            return;
+        }
+        parmas:
+
+        printf("WRITE ");
+        switch (token->type) {
+            case TOKEN_ID:
+                if (!ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value)){
+                    error(SEMANTIC_ERROR, "Variable not defined");
+                }
+            case TOKEN_STRING:
+                printf("%s@%s", get_3ac_token_type(), token->value->as_string->value);
+                break;
+            case TOKEN_INT:
+                printf("%s@%d", get_3ac_token_type(), token->value->as_int);
+                break;
+            case TOKEN_FLOAT:
+                printf("%s@%f", get_3ac_token_type(), token->value->as_float);
+                break;
+
+        }
+
+        print_instruction("\nWRITE", "\\010\n");
+        get_token();
+
+
+        if (token->type == TOKEN_COMMA) {
+            get_token();
+            goto parmas;
+        }
+        else if(token->type  == TOKEN_RPAREN || token->type == TOKEN_END_OF_LINE){
+            return;
+        }
+        else{
+            error(SYNTAX_ERROR, "Unknown token");
+        }
+
+    }
+
+}
+
+void PARSE_IF(ifj18_obj_t *func) {
+    static int if_count = 0;
+    if_count++;
+
     get_token();
 
     expression(func, COND_EXPR_RESULT_VARNAME);
 
+    print_instruction("JUMPIFEQ", "$$_IF_STATEMENT_%d LF@%s bool@true\n", if_count, COND_EXPR_RESULT_VARNAME);
+    print_instruction("JUMPIFNEQ", "$$_IF_ELSE_STATEMENT_%d LF@%s bool@true\n", if_count, COND_EXPR_RESULT_VARNAME);
+
     check_token_type(TOKEN_THEN, SYNTAX_ERROR, 1);
+
 
     get_token();
 
-    if(STATEMENT(func) != TOKEN_ELSE){
+    print_instruction("LABEL", "$$_IF_STATEMENT_%d\n", if_count);
+
+    if (STATEMENT(func) != TOKEN_ELSE) {
         error(SYNTAX_ERROR, "Expected else");
     }
+
+// :D
+    print_instruction("JUMP", "$$_IF_AFTER_%d\n", if_count);
+
+    print_instruction("LABEL", "$$_IF_ELSE_STATEMENT_%d\n", if_count);
+
 
     debug_info("If terminated with else");
 
     get_token();
 
-    if(STATEMENT(func) != TOKEN_END){
+    if (STATEMENT(func) != TOKEN_END) {
         error(SYNTAX_ERROR, "Expected end for if");
     }
 
     debug_info("If terminated with end");
+
+    print_instruction("LABEL", "$$_IF_AFTER_%d\n", if_count);
+
     get_token();
 
 }
+
 void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     token_prettyprint(token);
     if (!param_found && token->type == TOKEN_RPAREN) {
@@ -214,7 +304,6 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     if (ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value)) {
         error(SEMANTIC_ERROR, "Implicit declaration of function argument");
     }
-
 
 
     ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value, NULL);
