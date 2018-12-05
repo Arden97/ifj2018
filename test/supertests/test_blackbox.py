@@ -16,8 +16,7 @@ for x in rules["items"]:
     else:
         raise Exception('Unknown type')
 
-    output = run(['./ifj18'],stdin=open(filepath, 'rb'), encoding='utf-8', stdout=PIPE, stderr=PIPE)
-
+    output = run(['./ifj18'], stdin=open(filepath, 'rb'), encoding='utf-8', stdout=PIPE, stderr=PIPE)
 
     print(output.returncode)
 

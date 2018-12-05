@@ -1,4 +1,5 @@
 #include "expression.h"
+#include "semantics.h"
 
 // #define apply_on_new_token(stat) get_token();stat
 char precedence_table[16][16] = {
@@ -132,7 +133,7 @@ int length() {
 
     check_arg(TOKEN_STRING, 1);
 
-   printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
+    printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
 }
 
 
@@ -217,406 +218,184 @@ ifj18_token_t *copy_token(ifj18_token_t *act_token) {
     return new_token;
 }
 
-ifj18_var check_operands(ifj18_obj_t *operand_1, ifj18_obj_t *operand_2) {
-    if (operand_1->obj_type.var.type == operand_2->obj_type.var.type) {
-        return operand_1->obj_type.var.type;
+
+void print_operation_operand(ifj18_obj_t *operand, char *prefix, int type){
+    if (strlen(operand->obj_type.var.var_name) != 0) {
+        prefix = "LF";
+        printf("%s@%s", prefix, operand->obj_type.var.var_name);
+
     }
-    else return 0;
+    else{
+        if(type == IFJ18_TYPE_INT){
+            printf("%s@%d", prefix, operand->obj_type.var.value.as_int);
+        }
+        else{
+            printf("%s@%f", prefix, operand->obj_type.var.value.as_float);
+
+        }
+    }
 }
 
-int check_if_var (char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_obj_t *operand_2, ifj18_obj_t *tmp_var_obj, ifj18_var type){
-switch (type) {
-  case IFJ18_TYPE_INT:
-  if( strlen(operand_1->obj_type.var.var_name) != 0 && strlen(operand_2->obj_type.var.var_name) == 0 ) {
-    prefix_1 = "LF@";
-    printf("ADD LF@%s %s%s %s%d\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.var_name,
-           prefix_2, operand_2->obj_type.var.value.as_int);
-    tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-    return 1;
-  } else if(strlen(operand_2->obj_type.var.var_name) != 0 && strlen(operand_1->obj_type.var.var_name) == 0 ) {
-    prefix_2 = "LF@";
-    printf("ADD LF@%s %s%d %s%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_int,
-           prefix_2, operand_2->obj_type.var.var_name);
-    tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-    return 1;
-  } else if (strlen(operand_1->obj_type.var.var_name) != 0 && strlen(operand_1->obj_type.var.var_name) != 0 ){
-    prefix_1 = "LF@";
-    prefix_2 = "LF@";
-    printf("ADD LF@%s %s%s %s%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.var_name,
-           prefix_2, operand_2->obj_type.var.var_name);
-    tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-    return 1;
-  }
-  break;
 
-  case IFJ18_TYPE_FLOAT:
-  if( strlen(operand_1->obj_type.var.var_name) != 0 && strlen(operand_2->obj_type.var.var_name) == 0 ) {
-    prefix_1 = "LF@";
-    printf("ADD LF@%s %s%s %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.var_name,
-           prefix_2, operand_2->obj_type.var.value.as_float);
-    tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-    return 1;
-  } else if(strlen(operand_2->obj_type.var.var_name) != 0 && strlen(operand_1->obj_type.var.var_name) == 0 ) {
-    prefix_2 = "LF@";
-    printf("ADD LF@%s %s%f %s%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-           prefix_2, operand_2->obj_type.var.var_name);
-    tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-    return 1;
-  } else if (strlen(operand_1->obj_type.var.var_name) != 0 && strlen(operand_1->obj_type.var.var_name) != 0 ){
-    prefix_1 = "LF@";
-    prefix_2 = "LF@";
-    printf("ADD LF@%s %s%s %s%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.var_name,
-           prefix_2, operand_2->obj_type.var.var_name);
-    tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-    return 1;
-  }
-  break;
 
-  default: return 0;
+void check_if_var(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_obj_t *operand_2, ifj18_obj_t *tmp_var_obj,
+             ifj18_var type1, ifj18_var type2) {
+
+
+    int flag1 = 0, flag2 = 0, type=0;
+
+    if(type1 == IFJ18_TYPE_FLOAT || type2 == IFJ18_TYPE_FLOAT){
+        type = IFJ18_TYPE_FLOAT;
+    }
+    else{
+        type = IFJ18_TYPE_INT;
+    }
+
+    debug_info("Explicit type: %d\n", type);
+    if(type1 != type){
+        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
+
+        flag1 =  1;
+    }
+    else if(type2 != type){
+        print_instruction("INT2FLOAT", "LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
+        flag2 = 1;
+    }
+
+
+
+    print_instruction("ADD","LF@%s ", tmp_var_obj->obj_type.var.var_name);
+
+    if(flag1){
+        printf("LF@%s", TEMP_EXPRESSION_VARNAME);
+    }
+    else{
+        print_operation_operand(operand_1, prefix_1, type1);
+    }
+
+    printf(" ");
+
+    if(flag2){
+        printf("LF@%s", TEMP_EXPRESSION_VARNAME);
+    }
+    else{
+        print_operation_operand(operand_2, prefix_2, type2);
+    }
+
+    printf("\n");
+
+    tmp_var_obj->obj_type.var.type = type1 == IFJ18_TYPE_FLOAT || type2 == IFJ18_TYPE_FLOAT;
+
+
+
 }
+
+int convert_token_type(ifj18_token_t *token_d) {
+    switch (token_d->type) {
+        case TOKEN_FLOAT:
+            return IFJ18_TYPE_FLOAT;
+        case TOKEN_INT:
+            return IFJ18_TYPE_INT;
+        default:
+            error(INTERNAL_ERROR, "Unknown type\n");
+    }
 }
+
+void set_object_value(ifj18_token_t *token_d, ifj18_obj_t *func, ifj18_stack_t *stack) {
+    ifj18_obj_t *var;
+    if (token_d->type == TOKEN_ID) {
+        var = find_var(token_d, func);
+    } else {
+        var = init_var();
+    }
+
+
+    if (token_d->type == TOKEN_INT) {
+        debug_info("INT PASSED");
+        var->obj_type.var.value.as_int = token_d->value->as_int;
+        var->obj_type.var.type = IFJ18_TYPE_INT;
+    }
+    else if (token_d->type == TOKEN_FLOAT) {
+        debug_info("FLOAT PASSED");
+        var->obj_type.var.value.as_float = token_d->value->as_float;
+        var->obj_type.var.type = IFJ18_TYPE_FLOAT;
+    }
+
+    debug_info("Object type: %d\n", var->obj_type.var.type);
+
+    stack_push(stack, var);
+}
+
+char *get_bytecode_objtype(ifj18_obj_t *operand) {
+    if (operand->obj_type.var.type == IFJ18_TYPE_INT) {
+        return "int";
+    }
+    else if (operand->obj_type.var.type == IFJ18_TYPE_FLOAT) {
+        return "float";
+    }
+    else if (operand->obj_type.var.type == IFJ18_TYPE_STRING) {
+        return "string";
+    }
+    else if (strlen(operand->obj_type.var.var_name) != 0) {
+        return "LF";
+    }
+    else{
+        error(INTERNAL_ERROR, "Unknown operand: %f. Type: %d", operand->obj_type.var.value.as_float, operand->obj_type.var.type);
+    }
+}
+
 
 void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char *ret_var) {
     // stack_print(postfix_stack);
     // printf("-----------\n");
     ifj18_stack_t *output_stack = stack_init();
-    while (!stack_empty(postfix_stack)) {
-        ifj18_obj_t *tmp_var_obj = init_var();
-        tmp_var_obj->obj_type.var.var_name = COND_EXPR_RESULT_VARNAME;
-        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
+    ifj18_obj_t *tmp_var_obj = init_var();
+    tmp_var_obj->obj_type.var.var_name = TEMP_EXPRESSION_VARNAME;
 
-        //stack_print_objects(output_stack);
+    while (!stack_empty(postfix_stack)) {
         ifj18_token_t *act_token = stack_top(postfix_stack);
-//        debug_info("POP:");
-//        token_prettyprint(act_token);
         stack_pop(postfix_stack);
 
-        // if token == operand
-        if (act_token->type == TOKEN_ID) {
-            ifj18_obj_t *operand_id = find_var(act_token, act_function);
-            if (operand_id) {
-                operand_id->obj_type.var.var_name = token->value->as_string->value;
-                stack_push(output_stack, operand_id);
-            }
-        } else if (act_token->type == TOKEN_INT) {
-            ifj18_obj_t *number = init_var();
-            number->obj_type.var.value.as_int = act_token->value->as_int;
-            number->obj_type.var.type = IFJ18_TYPE_INT;
-            number->obj_type.var.var_name = "";
-            stack_push(output_stack, number);
-        } else if (act_token->type == TOKEN_FLOAT) {
-            ifj18_obj_t *number = init_var();
-            number->obj_type.var.value.as_float = act_token->value->as_float;
-            number->obj_type.var.type = IFJ18_TYPE_FLOAT;
-            number->obj_type.var.var_name = "";
-            stack_push(output_stack, number);
-
-        } else { // it's an operator
-            char *prefix_1 = (char *) malloc(20);
-            char *prefix_2 = (char *) malloc(20);
-
-            //stack_print_objects(output_stack);
-            //printf("---------\n");
-            ifj18_obj_t *operand_1 = stack_top(output_stack); /// obtaining fist operand
+        if (act_token->type == TOKEN_ID || act_token->type == TOKEN_INT || act_token->type == TOKEN_FLOAT) {
+            set_object_value(act_token, act_function, output_stack);
+        } else {
+            ifj18_obj_t *operand_1 = stack_top(output_stack);
             stack_pop(output_stack);
-            //printf("---------\n");
-            //stack_print_objects(output_stack);
-            //printf("%d\n", operand_1->obj_type.var.type);
-
-            if (operand_1->obj_type.var.type == IFJ18_TYPE_INT) {
-                prefix_1 = "int@";
-            } else if (operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT) {
-                prefix_1 = "float@";
-            } else if (operand_1->obj_type.var.type == IFJ18_TYPE_STRING) {
-                  prefix_1 = "string@";
-            } else if (strlen(operand_1->obj_type.var.var_name) != 0) {
-                prefix_1 = "LF@";
-            }
-
-            ifj18_obj_t *operand_2 = stack_top(output_stack); /// obtaining second operand
+            ifj18_obj_t *operand_2 = stack_top(output_stack);
             stack_pop(output_stack);
-            //printf("%d\n", operand_2->obj_type.var.type);
 
-            if (operand_2->obj_type.var.type == IFJ18_TYPE_INT) {
-                  prefix_2 = "int@";
-            } else if (operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT) {
-                  prefix_2 = "float@";
-            } else if (operand_1->obj_type.var.type == IFJ18_TYPE_STRING) {
-                  prefix_2 = "string@";
-            } else if (strlen(operand_2->obj_type.var.var_name) != 0) {
-                  prefix_2 = "LF@";
-            }
 
-            //stack_print_objects(output_stack);
+            char *prefix_1 = get_bytecode_objtype(operand_1);
+            char *prefix_2 = get_bytecode_objtype(operand_2);
 
-            debug_info("######\n");
-            switch (act_token->type) {
-                case TOKEN_OP_PLUS:
-                    if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                      if (!check_if_var (prefix_1, operand_1, prefix_2, operand_2, tmp_var_obj, IFJ18_TYPE_INT)) {
-                        printf("ADD LF@%s %s%d %s%d\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_int,
-                               prefix_2, operand_2->obj_type.var.value.as_int);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-                      }
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                      if (!check_if_var (prefix_1, operand_1, prefix_2, operand_2, tmp_var_obj, IFJ18_TYPE_FLOAT)) {
-                        printf("ADD LF@%s %s%f %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                               prefix_2, operand_2->obj_type.var.value.as_float);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                      }
-                    } else if(operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_2->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                      printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
-                      if (!check_if_var (prefix_1, operand_1, prefix_2, operand_2, tmp_var_obj, IFJ18_TYPE_FLOAT)) {
-                        printf("ADD LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                               TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                      }
-                    } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                      printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                      if (!check_if_var (prefix_1, operand_1, prefix_2, operand_2, tmp_var_obj, IFJ18_TYPE_FLOAT)) {
-                        printf("ADD LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
-                               TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                      }
-                    }
-                    break;
 
-                case TOKEN_OP_MINUS:
-                    if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                        printf("SUB LF@%s %s%d %s%d\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_int,
-                               prefix_2, operand_2->obj_type.var.value.as_int);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
+            check_if_var(prefix_1, operand_1, prefix_2,
+                    operand_2, tmp_var_obj, operand_1->obj_type.var.type, operand_2->obj_type.var.type);
 
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                        printf("SUB LF@%s %s%f %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                              prefix_2, operand_2->obj_type.var.value.as_float);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
 
-                    } else if(operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_2->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
-                        printf("SUB LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                              TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
 
-                    } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                        printf("SUB LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
-                              TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                    }
-                    break;
-
-                case TOKEN_OP_MUL:
-                    if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                        printf("MUL LF@%s %s%d %s%d\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_int,
-                              prefix_2, operand_2->obj_type.var.value.as_int);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                        printf("MUL LF@%s %s%f %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                              prefix_2, operand_2->obj_type.var.value.as_float);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if(operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_2->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
-                        printf("MUL LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                              TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                        printf("MUL LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
-                              TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                    }
-                    break;
-
-                case TOKEN_OP_DIV:
-                    if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME2, operand_2->obj_type.var.value.as_int);
-                        printf("DIV LF@%s LF@%s LF@%s\n", tmp_var_obj->obj_type.var.var_name, TEMP_EXPRESSION_VARNAME2, TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                        printf("DIV LF@%s %s%f %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                              prefix_2, operand_2->obj_type.var.value.as_float);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if(operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_2->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
-                        printf("DIV LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                              TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                        printf("DIV LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
-                              TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                    }
-                    break;
-
-                case TOKEN_OP_LT:
-                    if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                        printf("LT LF@%s %s%d %s%d\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_int,
-                          prefix_2, operand_2->obj_type.var.value.as_int);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                        printf("LT LF@%s %s%f %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                          prefix_2, operand_2->obj_type.var.value.as_float);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-                        printf("LT LF@%s %s%s %s%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                          prefix_2, operand_2->obj_type.var.value.as_pointer);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_STRING;
-
-                    } else if(operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_2->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
-                        printf("LT LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                          TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                        printf("LT LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
-                          TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                    }
-                    break;
-
-                case TOKEN_OP_GT:
-                    if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                        printf("LT LF@%s %s%d %s%d\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_int,
-                            prefix_2, operand_2->obj_type.var.value.as_int);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_INT;
-
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                        printf("LT LF@%s %s%f %s%f\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                            prefix_2, operand_2->obj_type.var.value.as_float);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-                        printf("LT LF@%s %s%s %s%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                            prefix_2, operand_2->obj_type.var.value.as_pointer);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_STRING;
-
-                    } else if(operand_1->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_2->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_2->obj_type.var.value.as_int);
-                        printf("LT LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_1->obj_type.var.value.as_float,
-                          TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-
-                    } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
-                        printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                        printf("LT LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
-                          TEMP_EXPRESSION_VARNAME);
-                        tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;
-                    }
-                    break;
-
-                // case TOKEN_OP_LTE:
-                //     if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                //         printf("GTS LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //         printf("NOTS LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                //         printf("GTS LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_float,
-                //                prefix_2, operand_2->obj_type.var.value.as_float);
-                //         printf("NOTS LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_float,
-                //                prefix_2, operand_2->obj_type.var.value.as_float);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-                //         printf("GTSLF@ LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //         printf("NOTS LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //     } else {
-                //         error(TYPE_ERROR, "operands should have same type");
-                //     }
-                //     break;
-
-                // case TOKEN_OP_GTE:
-                //     if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                //         printf("LTS LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //         printf("NOTS LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                //         printf("LTS LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //         printf("NOTS LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-                //         printf("LTS LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //         printf("NOTS LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //     } else {
-                //         error(TYPE_ERROR, "operands should have same type");
-                //     }
-                //     break;
-
-                // case TOKEN_OP_ASSIGN:
-                //     if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                //         printf("EQ LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                //         printf("EQ LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_float,
-                //                prefix_2, operand_2->obj_type.var.value.as_float);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-                //         printf("EQ LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //     } else {
-                //         error(TYPE_ERROR, "operands should have same type");
-                //     }
-                //     break;
-                //
-                // case TOKEN_OP_NEQ:
-                //     if (check_operands(operand_1, operand_2) == IFJ18_TYPE_INT) {
-                //         printf("EQS LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //         printf("NOTS LF@%s %s%d %s%d\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_int,
-                //                prefix_2, operand_2->obj_type.var.value.as_int);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_FLOAT) {
-                //         printf("EQS LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_float,
-                //                prefix_2, operand_2->obj_type.var.value.as_float);
-                //         printf("NOTS LF@%s %s%f %s%f\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_float,
-                //                prefix_2, operand_2->obj_type.var.value.as_float);
-                //     } else if (check_operands(operand_1, operand_2) == IFJ18_TYPE_STRING) {
-                //         printf("EQS LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //         printf("NOTS LF@%s %s%s %s%s\n", ret_var, prefix_1, operand_1->obj_type.var.value.as_pointer,
-                //                prefix_2, operand_2->obj_type.var.value.as_pointer);
-                //     } else {
-                //         error(TYPE_ERROR, "operands should have same type");
-                //     }
-                //     break;
-            }
             stack_push(output_stack, tmp_var_obj);
         }
+
 
     }
     stack_pop(output_stack);
 
-    if (!stack_empty(output_stack)) {
-        debug_info("######\n");
-        ifj18_obj_t *only_operand = stack_top(output_stack);
-        stack_pop(output_stack);
-        if (only_operand->obj_type.var.type == IFJ18_TYPE_INT) {
-            printf("MOV LF@%s int@%d\n", ret_var, only_operand->obj_type.var.value.as_int);
-        } else if (only_operand->obj_type.var.type == IFJ18_TYPE_FLOAT) {
-            printf("MOV LF@%s float@%f\n", ret_var, only_operand->obj_type.var.value.as_float);
-        } else if (strlen(only_operand->obj_type.var.var_name) != 0) {
-            printf("MOV LF@%s LF@%s\n", ret_var, only_operand->obj_type.var.var_name);
-        }
-    }
-    else{
-      printf("MOV LF@%s LF@%s\n", ret_var, COND_EXPR_RESULT_VARNAME);
-    }
-    debug_info("######\n");
+//    if (!stack_empty(output_stack)) {
+//        debug_info("###### dddd\n");
+//        ifj18_obj_t *only_operand = stack_top(output_stack);
+//        stack_pop(output_stack);
+//        if (only_operand->obj_type.var.type == IFJ18_TYPE_INT) {
+//            printf("MOV LF@%s int@%d\n", ret_var, only_operand->obj_type.var.value.as_int);
+//        } else if (only_operand->obj_type.var.type == IFJ18_TYPE_FLOAT) {
+//            printf("MOV LF@%s float@%f\n", ret_var, only_operand->obj_type.var.value.as_float);
+//        } else if (strlen(only_operand->obj_type.var.var_name) != 0) {
+//            printf("MOV LF@%s LF@%s\n", ret_var, only_operand->obj_type.var.var_name);
+//        }
+//    } else {
+        print_instruction("MOVE", "LF@%s LF@%s\n", ret_var, TEMP_EXPRESSION_VARNAME);
+//    }
+//    debug_info("######\n");
 }
 
 int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
@@ -677,7 +456,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
 
     /// incorrect count of brackets or operands and operators
     if (count_of_bracket || sum_count)
-        error(SYNTAX_ERROR, "error while parsing expressions. Given: %s", ifj18_token_type_string(token->type));
+        error(SYNTAX_ERROR, "error while parsing expressions");
 
     /// generating instruction
     post_to_instr(infix_stack, act_function, ret_var);
