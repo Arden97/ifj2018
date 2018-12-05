@@ -4,24 +4,22 @@
 #define MAX_STRING_SIZE 200
 
 #include "error.h"
-#include <string.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
+#include <string.h>
 
 typedef struct {
-    int length;
-    int mem_alloc;
-    char *value;
+  int length;
+  int mem_alloc;
+  char *value;
 } string;
 
 int string_init(string *str);
 
-
 void string_free(string *str);
 
 void string_reset(string *str);
-
 
 int string_append(string *str, char sym);
 

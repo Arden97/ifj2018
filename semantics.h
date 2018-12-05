@@ -12,6 +12,7 @@ typedef enum {
 
 typedef struct ifj18_var_t {
   ifj18_var type;
+  char *var_name;
   union {
     void *as_pointer;
     int as_int;
@@ -38,4 +39,5 @@ ifj18_obj_t *init_var();
 ifj18_obj_t *init_func();
 
 struct ifj18_hash_t *global_table;
+
 #endif

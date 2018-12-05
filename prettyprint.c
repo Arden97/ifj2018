@@ -1,21 +1,27 @@
-#include "scanner.h"
-#include <stdio.h>
+
+#include "prettyprint.h"
 
 void token_prettyprint(ifj18_token_t *token) {
-  printf("%s", ifj18_token_type_string(token->type));
+  debug_info("%sTOKEN:", KBLU);
+#ifdef DEBUG
   switch (token->type) {
   case TOKEN_INT:
-    printf(" %d", token->value->as_int);
+    debug_info_unwrapped(" %d", token->value->as_int);
     break;
   case TOKEN_FLOAT:
-    printf(" %f", token->value->as_float);
+    debug_info_unwrapped(" %f", token->value->as_float);
     break;
   case TOKEN_STRING:
-    printf(" %s", token->value->as_string->value);
+    debug_info_unwrapped(" %s", token->value->as_string->value);
     break;
   case TOKEN_ID:
-    printf(" %s", token->value->as_string->value);
+    debug_info_unwrapped(" %s", token->value->as_string->value);
+    break;
+  default:
+    debug_info_unwrapped(" %s", ifj18_token_strings[token->type]);
     break;
   }
-  printf("\n");
+  debug_info_unwrapped("%s", RESET);
+  debug_info_unwrapped("\n");
+#endif
 }

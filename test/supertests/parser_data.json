@@ -1,0 +1,181 @@
+{
+  "items": [
+    {
+      "name": "double_assign",
+      "input": "double_assign.rb",
+      "output": "double_assign.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "scope",
+      "input": "scope.rb",
+      "output": "scope.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "func_with_if",
+      "input": "func_with_if.rb",
+      "output": "func_with_if.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "sum",
+      "input": "sum.rb",
+      "output": "sum.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "print_string",
+      "input": "print_string.rb",
+      "output": "print_string.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "sub",
+      "input": "sub.rb",
+      "output": "sub.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "assign",
+      "input": "assign.rb",
+      "output": "assign.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "func_with_while",
+      "input": "func_with_while.rb",
+      "output": "func_with_while.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "nested_if",
+      "input": "nested_if.rb",
+      "output": "nested_if.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "print_complex_string",
+      "input": "print_complex_string.rb",
+      "output": "print_complex_string.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "while_with_if",
+      "input": "while_with_if.rb",
+      "output": "while_with_if.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "factorial",
+      "input": "factorial.rb",
+      "output": "factorial.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "mul",
+      "input": "mul.rb",
+      "output": "mul.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "nested_else",
+      "input": "nested_else.rb",
+      "output": "nested_else.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "print_expr",
+      "input": "print_expr.rb",
+      "output": "print_expr.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "simple_else",
+      "input": "simple_else.rb",
+      "output": "simple_else.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "simple_if",
+      "input": "simple_if.rb",
+      "output": "simple_if.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "nested_if_with_assign",
+      "input": "nested_if_with_assign.rb",
+      "output": "nested_if_with_assign.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "func_with_args",
+      "input": "func_with_args.rb",
+      "output": "func_with_args.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "simple_while",
+      "input": "simple_while.rb",
+      "output": "simple_while.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "div",
+      "input": "div.rb",
+      "output": "div.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "simple_func",
+      "input": "simple_func.rb",
+      "output": "simple_func.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "complex_expr",
+      "input": "complex_expr.rb",
+      "output": "complex_expr.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "complex_func",
+      "input": "complex_func.rb",
+      "output": "complex_func.out",
+      "type": "file",
+      "expected": "success"
+    },
+    {
+      "name": "func_calls_func",
+      "input": "func_calls_func.rb",
+      "output": "func_calls_func.out",
+      "type": "file",
+      "expected": "success"
+    }
+  ],
+ "basepath_in": "test/supertests/in",
+ "basepath_out": "test/supertests/out"
+}

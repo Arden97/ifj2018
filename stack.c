@@ -1,87 +1,79 @@
-/*
-Copyright (c) 2017, Michael J Welsh
-
-Permission to use, copy, modify, and/or distribute this software
-for any purpose with or without fee is hereby granted, provided
-that the above copyright notice and this permission notice appear
-in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
-WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
-AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
-CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
-NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
-CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-*/
-
-#include <assert.h>
-#include <stddef.h>
-
 #include "stack.h"
+#include "error.h"
+#include "prettyprint.h"
+#include "scanner.h"
+#include "semantics.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-void stack_init(Stack *stack) {
-  assert(stack);
+#define DEBUG
 
-  stack->tail = NULL;
-  stack->size = 0;
+ifj18_stack_t *stack_init() {
+  ifj18_stack_t *s;
+  if ((s = (ifj18_stack_t *)malloc(sizeof(ifj18_stack_t))) == NULL)
+    error(INTERNAL_ERROR, "stack memory allocation");
+  s->top_ptr = NULL;
+  return s;
 }
 
-StackNode *stack_peek(const Stack *stack) {
-  assert(stack);
+void stack_push(ifj18_stack_t *s, void *d) {
+  stack_elem_t *new_element;
+  if ((new_element = (stack_elem_t *)malloc(sizeof(struct stack_elem_t))) == NULL)
+    error(INTERNAL_ERROR, "stack push error");
 
-  return stack->tail;
+  /// insert new element on top of stack
+  new_element->data = d;
+  new_element->next_ptr = s->top_ptr;
+  s->top_ptr = new_element;
 }
 
-size_t stack_size(const Stack *stack) {
-  assert(stack);
+void stack_pop(ifj18_stack_t *s) {
 
-  return stack->size;
+  if (s->top_ptr != NULL)
+    s->top_ptr = s->top_ptr->next_ptr;
 }
 
-int stack_empty(const Stack *stack) {
-  assert(stack);
+void *stack_top(ifj18_stack_t *s) {
 
-  return stack->size == 0;
-}
-
-void stack_push(Stack *stack, StackNode *node) {
-  assert(stack && node);
-
-  node->prev = stack->tail;
-  stack->tail = node;
-
-  ++stack->size;
-}
-
-StackNode *stack_pop(Stack *stack) {
-  StackNode *n;
-
-  assert(stack);
-
-  n = stack->tail;
-
-  if (!n) {
+  if (s->top_ptr != NULL)
+    return s->top_ptr->data;
+  else
     return NULL;
-  }
-
-  stack->tail = n->prev;
-
-  n->prev = STACK_POISON_PREV;
-
-  --stack->size;
-
-  return n;
 }
 
-void stack_remove_all(Stack *stack) {
-  assert(stack);
+int stack_empty(ifj18_stack_t *s) { return (s->top_ptr != NULL ? 0 : -1); }
 
-  if (stack->tail) {
-    stack->tail->prev = STACK_POISON_PREV;
+void stack_copy(ifj18_stack_t *dst_stack, ifj18_stack_t *src_stack) {
+
+  while (!stack_empty(src_stack)) {
+    stack_push(dst_stack, stack_top(src_stack));
+    stack_pop(src_stack);
   }
+}
 
-  stack->tail = NULL;
-  stack->size = 0;
+void stack_print(ifj18_stack_t *s) {
+  (void)s;
+#ifdef DEBUG
+  ifj18_token_t *tokend;
+  stack_elem_t *tmp = s->top_ptr;
+  while (s->top_ptr != NULL) {
+    debug_info("#STACK_SHIT:");
+    token_prettyprint((ifj18_token_t *)s->top_ptr->data);
+    s->top_ptr = s->top_ptr->next_ptr;
+  }
+  s->top_ptr = tmp;
+#endif
+}
+void stack_print_objects(ifj18_stack_t *s) {
+  (void)s;
+#ifdef DEBUG
+  ifj18_token_t *tokend;
+  stack_elem_t *tmp = s->top_ptr;
+  while (s->top_ptr != NULL) {
+    debug_info("#STACK_SHIT Object:");
+    debug_info("%d\n", ((ifj18_obj_t *)s->top_ptr->data)->obj_type.var.value.as_int);
+    s->top_ptr = s->top_ptr->next_ptr;
+  }
+  s->top_ptr = tmp;
+#endif
 }
