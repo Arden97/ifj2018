@@ -132,7 +132,7 @@ int length() {
 
     check_arg(TOKEN_STRING, 1);
 
-    printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
+   printf("PUSHS %sCREATEFRAME\nUSHFRAME, token->value->as_string");
 }
 
 
@@ -677,7 +677,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
 
     /// incorrect count of brackets or operands and operators
     if (count_of_bracket || sum_count)
-        error(SYNTAX_ERROR, "error while parsing expressions");
+        error(SYNTAX_ERROR, "error while parsing expressions. Given: %s", ifj18_token_type_string(token->type));
 
     /// generating instruction
     post_to_instr(infix_stack, act_function, ret_var);

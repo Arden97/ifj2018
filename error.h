@@ -1,9 +1,11 @@
+#ifndef ifj_error
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "utils.h"
-
-#ifndef ifj_error
-
+#include "gc.h"
+#include "utils.h"
+#include <stdarg.h>
 #define ifj_error
 
 #define LEXICAL_ERROR 1
@@ -16,7 +18,7 @@
 #define INTERNAL_ERROR 99
 
 
-void error_msg(int error_code, char *details);
-void error(int error_code, char *details);
+char *error_msg(int error_code);
+void error(int error_code, const char *format, ...);
 
 #endif

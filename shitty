@@ -12,6 +12,12 @@
 #
 #def asd a,b
 #end
-def asd (b, a)
+def asd(a,b)
+if 1+1
 a = 1+1
+else
+1+1
+1+1
+end
+end
 end
