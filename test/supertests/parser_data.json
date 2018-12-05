@@ -1,17 +1,12 @@
 {
-  "items": [{
-    "name": "token_str",
-    "input": "assign.rb",
-    "output": 0,
-    "type": "file",
-    "expected":"error"
-  },
-  {
-    "name": "token_lambda",
-    "input": "Bye!",
-    "output": "25\n1\n",
-    "type": "string",
-    "expected":"success"
-  }],
-  "basepatH":"test/supertests/in"
+  "items": [
+    {
+      "name": "assign",
+      "input": "assign.rb",
+      "output": "assign.out",
+      "type": "file",
+      "expected":"success"
+    }],
+  "basepath_in":"test/supertests/in",
+  "basepath_out":"test/supertests/out"
 }
