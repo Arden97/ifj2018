@@ -1,12 +1,5 @@
-#include "error.h"
 #include "scanner.h"
-#include <ctype.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include "strlib.h"
+
 
 void init_token() {
   token = malloc(sizeof(ifj18_token_t));
@@ -72,7 +65,7 @@ static ifj18_token_t *scan_ident(int c) {
       if (0 == strcmp("print", buf)) return save_token(TOKEN_PRINT);
       break;
     case 6:
-      if (0 == strcmp("inputs", buf)) return save_token(TOKEN_INPUTS);  
+      if (0 == strcmp("inputs", buf)) return save_token(TOKEN_INPUTS);
       if (0 == strcmp("inputf", buf)) return save_token(TOKEN_INPUTF);
       if (0 == strcmp("inputi", buf)) return save_token(TOKEN_INPUTI);
       if (0 == strcmp("length", buf)) return save_token(TOKEN_LENGTH);
@@ -91,7 +84,7 @@ static int hex_literal() {
   int a = hex(fgetc(stdin));
   int b = hex(fgetc(stdin));
   if (a > -1 && b > -1) return a << 4 | b;
-  error_msg(SYNTAX_ERROR, "string hex literal \\x contains invalid digits");
+  error(SYNTAX_ERROR, "string hex literal \\x contains invalid digits");
   return -1;
 }
 
@@ -135,7 +128,7 @@ static ifj18_token_t *scan_string() {
  */
 
 static ifj18_token_t *scan_number(int c) {
-  int n = 0, type = 0, expo = 0, e;
+  int n = 0, type = 0, expo = 0, e = 0;
   int expo_type = 1;
   /* expo_type:
    * 1 -> '+'(default)
@@ -151,7 +144,7 @@ static ifj18_token_t *scan_number(int c) {
   switch (c = fgetc(stdin)) {
     case 'x':
       if (!isxdigit(c = fgetc(stdin))) {
-        error_msg(SYNTAX_ERROR, "hex literal expects one or more digits");
+        error(SYNTAX_ERROR, "hex literal expects one or more digits");
         return 0;
       } else {
         do n = n << 4 | hex(c);
@@ -207,10 +200,10 @@ static ifj18_token_t *scan_number(int c) {
     ungetc(c, stdin);
     if (expo_type == 0) expo *= -1;
     if (type == 0) {
-      token->value->as_int = n * pow(10, expo);
+      token->value->as_int = (int) (n * pow(10, expo));
       return save_token(TOKEN_INT);
     } else {
-      token->value->as_float = ((float) n / e) * pow(10, expo);
+      token->value->as_float = (float) (((float) n / e) * pow(10, expo));
       return save_token(TOKEN_FLOAT);
     }
   }
@@ -234,23 +227,35 @@ ifj18_token_t *get_token() {
     case '*': return save_token(TOKEN_OP_MUL);
     case '/': return save_token(TOKEN_OP_DIV);
     case -1: return save_token(TOKEN_END_OF_FILE);
-    case '!': return '=' == (c = fgetc(stdin)) ? save_token(TOKEN_OP_NEQ) : (ungetc(c, stdin), save_token(TOKEN_OP_NOT));
+    case '!':
+      if('=' == (c = fgetc(stdin))){
+        return save_token(TOKEN_OP_NEQ);
+      }
+      else{
+        error(LEXICAL_ERROR, "Unknown token");
+      }
     case '=': return '=' == (c = fgetc(stdin)) ? save_token(TOKEN_OP_EQ) : (ungetc(c, stdin), save_token(TOKEN_OP_ASSIGN));
     case '&':
       switch (c = fgetc(stdin)) {
         case '&':
           return save_token(TOKEN_OP_AND);
+        default:
+          error(LEXICAL_ERROR, "Unknown token");
       }
     case '|':
       switch (c = fgetc(stdin)) {
         case '|':
           return save_token(TOKEN_OP_OR);
+        default:
+          error(LEXICAL_ERROR, "Unknown token");
       }
     case '<':
       switch (c = fgetc(stdin)) {
         case '=': return save_token(TOKEN_OP_LTE);
         default: return ungetc(c, stdin), save_token(TOKEN_OP_LT);
+
       }
+
     case '>':
       switch (c = fgetc(stdin)) {
         case '=': return save_token(TOKEN_OP_GTE);
@@ -260,6 +265,7 @@ ifj18_token_t *get_token() {
       while ((c = fgetc(stdin)) != '\n' && c) ; ungetc(c, stdin);
       goto scan;
     case '\n':
+      return save_token(TOKEN_END_OF_LINE);
     case '\r':
       goto scan;
     case '"':
@@ -269,7 +275,39 @@ ifj18_token_t *get_token() {
     default:
       if (isalpha(c) || '_' == c) return scan_ident(c);
       if (isdigit(c) || '.' == c) return scan_number(c);
-      error_msg(LEXICAL_ERROR, "illegal character");
+      error(LEXICAL_ERROR, "illegal character");
       return save_token(TOKEN_ILLEGAL);
   }
+}
+
+
+void check_arg(int required_type, char id_allowed) {
+  if ((token->type != required_type) || (id_allowed && token->type != TOKEN_ID)) {
+    error(SEMANTIC_ERROR, "Incorrect type");
+  }
+}
+
+void check_token_type(int required_type, int error_type, int inv) {
+  if (inv) {
+    if (token->type != required_type) {
+      error(error_type, "Unknown type, required:%s. Given: %s", ifj18_token_type_string(required_type), ifj18_token_type_string(token->type));
+    }
+  } else {
+    if (token->type == required_type) {
+      error(error_type, "");
+    }
+  }
+}
+
+void check_token_type_msg(int required_type, int error_type, int inv, char *message) {
+  if (inv) {
+    if (token->type != required_type) {
+      error(error_type, message);
+    }
+  } else {
+    if (token->type == required_type) {
+      error(error_type, message);
+    }
+  }
+//  printf("end of check_token\n");
 }

@@ -133,7 +133,32 @@ void check_token_type(int required_type, int error_type, int inv) {
     }
   } else {
     if (token->type == required_type) {
-      error(error_type, "");
+
+
+
+    error(error_type, "");
+    }
+    /// ensure the correct order
+    stack_copy(infix_stack, output_stack);
+
+    /// incorrect count of brackets or operands and operators
+    if (count_of_bracket || sum_count)
+        error(SYNTAX_ERROR, "error while parsing expressions. Sum count: %d. Bracet count: %d", sum_count, count_of_bracket);
+
+    debug_info("sumcum: %d\n", operatiobs_ocount);
+    /// generating instruction
+    post_to_instr(infix_stack, act_function, ret_var, operatiobs_ocount);
+}
+
+ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
+
+    /// find variable in local symtable of actual function
+    if (find_token->type == TOKEN_ID) {
+        ifj18_obj_t *found = ifj18_hash_get(act_function->obj_type.func.local_symtable, token->value->as_string->value);
+        /// we did not find
+        if (!found)
+            error(SEMANTIC_ERROR, "undefined variable in epression");
+        return found;
     }
   }
 }
