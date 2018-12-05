@@ -34,5 +34,6 @@ int main() {
 
   get_token();
   PROG();
+  return 0;
 //  PROG();
 }

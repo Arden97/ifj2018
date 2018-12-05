@@ -373,7 +373,7 @@ void post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char
                       }
                     } else if(operand_2->obj_type.var.type == IFJ18_TYPE_FLOAT && operand_1->obj_type.var.type != IFJ18_TYPE_FLOAT){
                       printf("INT2FLOAT LF@%s int@%d\n", TEMP_EXPRESSION_VARNAME, operand_1->obj_type.var.value.as_int);
-                      if (!check_if_var (prefix_1, operand_1, prefix_2, operand_2, tmp_var_obj)) {
+                      if (!check_if_var (prefix_1, operand_1, prefix_2, operand_2, tmp_var_obj, IFJ18_TYPE_FLOAT)) {
                         printf("ADD LF@%s %s%f LF@%s\n", tmp_var_obj->obj_type.var.var_name, prefix_1, operand_2->obj_type.var.value.as_float,
                                TEMP_EXPRESSION_VARNAME);
                         tmp_var_obj->obj_type.var.type = IFJ18_TYPE_FLOAT;

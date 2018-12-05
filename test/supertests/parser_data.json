@@ -2,7 +2,7 @@
   "items": [{
     "name": "token_str",
     "input": "assign.rb",
-    "output": "25\n0\n",
+    "output": 0,
     "type": "file",
     "expected":"error"
   },
@@ -13,5 +13,5 @@
     "type": "string",
     "expected":"success"
   }],
-  "basepatH":"supertests/in"
+  "basepatH":"test/supertests/in"
 }
