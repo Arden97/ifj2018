@@ -15,7 +15,7 @@
 ifj18_obj_t *init_var() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
   if (var == NULL) {
-    error(INTERNAL_ERR, "can't allocate memory for variable");
+    error(INTERNAL_ERROR, "can't allocate memory for variable");
   }
 
   var->type = IFJ18_TYPE_NULL;
@@ -30,14 +30,14 @@ ifj18_obj_t *init_var() {
 ifj18_obj_t *init_func() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
   if (var == NULL) {
-    error(INTERNAL_ERR, "can't allocate memory for variable");
+    error(INTERNAL_ERROR, "can't allocate memory for variable");
   }
   var->type = IFJ18_TYPE_NULL;
   var->var_name = (char *)malloc(20);
 
   ifj18_func_t *func = (ifj18_func_t *)malloc(sizeof(ifj18_func_t));
   if (func == NULL) {
-    error(INTERNAL_ERR, "can't allocate memory for function");
+    error(INTERNAL_ERROR, "can't allocate memory for function");
   }
   string *params = malloc(sizeof(string));
   string_init(params);

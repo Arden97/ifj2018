@@ -208,6 +208,14 @@ void generate_3ac_expressions(char *prefix_1, ifj18_obj_t *operand_1, char *pref
         flag2 = 1;
     }
 
+    if (!strcmp(operation, "DIV") && (operand_1->obj_type.var.value.as_int == 0 ||
+                                      operand_1->obj_type.var.value.as_float == 0.0))
+          error(DIVBYZERO_ERROR, "trying to divide by zero");
+
+    if (!strcmp(operation, "DIV") && (operand_2->obj_type.var.value.as_int == 0 ||
+                                      operand_2->obj_type.var.value.as_float == 0.0))
+          error(DIVBYZERO_ERROR, "trying to divide by zero");
+
     print_instruction(operation, "LF@%s ", tmp_var_obj->obj_type.var.var_name);
 
     if (flag2) {
