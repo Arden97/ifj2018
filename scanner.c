@@ -1,5 +1,15 @@
-#include "scanner.h"
+///////////////////////////////////////////////////////////////////////////////////
+// School:      Brno University of Technology, Faculty of Information Technology //
+// Course:      Formal Languages and Compilers                                   //
+// Project:     IFJ18                                                            //
+// Module:      Lexical analysis 	                                               //
+// Authors:     Artem Denisov       (xdenis00)                                   //
+//              Volodymyr Piskun    (xpisku03)                                   //
+//              Alexandr Demicev    (xdemic00)                                   //
+///////////////////////////////////////////////////////////////////////////////////
 
+
+#include "scanner.h"
 
 void init_token() {
   token = malloc(sizeof(ifj18_token_t));
@@ -85,7 +95,7 @@ static int hex_literal() {
   int a = hex(fgetc(stdin));
   int b = hex(fgetc(stdin));
   if (a > -1 && b > -1) return a << 4 | b;
-  error(SYNTAX_ERROR, "string hex literal \\x contains invalid digits");
+  error(LEXICAL_ERROR, "string hex literal \\x contains invalid digits");
   return -1;
 }
 
@@ -145,7 +155,7 @@ static ifj18_token_t *scan_number(int c) {
   switch (c = fgetc(stdin)) {
     case 'x':
       if (!isxdigit(c = fgetc(stdin))) {
-        error(SYNTAX_ERROR, "hex literal expects one or more digits");
+        error(LEXICAL_ERROR, "hex literal expects one or more digits");
         return 0;
       } else {
         do n = n << 4 | hex(c);
@@ -284,7 +294,7 @@ ifj18_token_t *get_token() {
 
 void check_arg(int required_type, char id_allowed) {
   if ((token->type != required_type) || (id_allowed && token->type != TOKEN_ID)) {
-    error(SEMANTIC_ERROR, "Incorrect type");
+    error(TYPE_ERROR, "Incorrect type");
   }
 }
 

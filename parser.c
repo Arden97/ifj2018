@@ -1,3 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////////
+// School:      Brno University of Technology, Faculty of Information Technology //
+// Course:      Formal Languages and Compilers                                   //
+// Project:     IFJ18                                                            //
+// Module:      Syntax analysis (Recursive descent) 	                           //
+// Authors:     Artem Denisov       (xdenis00)                                   //
+//              Volodymyr Piskun    (xpisku03)                                   //
+//              Alexandr Demicev    (xdemic00)                                   //
+///////////////////////////////////////////////////////////////////////////////////
+
 #include "parser.h"
 #include "semantics.h"
 

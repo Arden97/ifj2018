@@ -1,3 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////////
+// School:      Brno University of Technology, Faculty of Information Technology //
+// Course:      Formal Languages and Compilers                                   //
+// Project:     IFJ18                                                            //
+// Module:      Predence analysis	                                               //
+// Authors:     Artem Denisov       (xdenis00)                                   //
+//              Volodymyr Piskun    (xpisku03)                                   //
+//              Alexandr Demicev    (xdemic00)                                   //
+///////////////////////////////////////////////////////////////////////////////////
+
 #include "expression.h"
 #include "semantics.h"
 
@@ -445,7 +455,7 @@ ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
         /// we did not find
         if (!ifj18_hash_has((kh_value_t *) act_function->obj_type.func.local_symtable,
                             find_token->value->as_string->value)) {
-            error(SEMANTIC_ERROR, "\n");
+            error(DEFINITION_ERROR, "unknown variable");
         }
 
         return found;

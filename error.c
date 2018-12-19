@@ -1,3 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////////
+// School:      Brno University of Technology, Faculty of Information Technology //
+// Course:      Formal Languages and Compilers                                   //
+// Project:     IFJ18                                                            //
+// Module:      Error states	                                                   //
+// Authors:     Artem Denisov       (xdenis00)                                   //
+//              Volodymyr Piskun    (xpisku03)                                   //
+//              Alexandr Demicev    (xdemic00)                                   //
+///////////////////////////////////////////////////////////////////////////////////
+
 #include "error.h"
 
 
@@ -57,7 +67,7 @@ void error(int error_code, const char *format, ...){
     vfprintf(stderr, format, ap);
     va_end (ap);
 
-    fprintf(stderr, "%s", RESET);
+    fprintf(stderr, "%s\n", RESET);
 //  gc_dispose();
   exit(error_code);
 }

@@ -1,3 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////////
+// School:      Brno University of Technology, Faculty of Information Technology //
+// Course:      Formal Languages and Compilers                                   //
+// Project:     IFJ18                                                            //
+// Module:      Header file of garbage collector 	                               //
+// Authors:     Artem Denisov       (xdenis00)                                   //
+//              Volodymyr Piskun    (xpisku03)                                   //
+//              Alexandr Demicev    (xdemic00)                                   //
+///////////////////////////////////////////////////////////////////////////////////
+
 #ifndef ifj_GC
 
 #define ifj_GC

@@ -1,3 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////////
+// School:      Brno University of Technology, Faculty of Information Technology //
+// Course:      Formal Languages and Compilers                                   //
+// Project:     IFJ18                                                            //
+// Module:      Semantic control 	                                               //
+// Authors:     Artem Denisov       (xdenis00)                                   //
+//              Volodymyr Piskun    (xpisku03)                                   //
+//              Alexandr Demicev    (xdemic00)                                   //
+///////////////////////////////////////////////////////////////////////////////////
+
 #include "semantics.h"
 #include "symtable.h"
 #include "strlib.h"
@@ -5,7 +15,7 @@
 ifj18_obj_t *init_var() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
   if (var == NULL) {
-    // todo: add error
+    error(INTERNAL_ERR, "can't allocate memory for variable");
   }
 
   var->type = IFJ18_TYPE_NULL;
@@ -20,11 +30,14 @@ ifj18_obj_t *init_var() {
 ifj18_obj_t *init_func() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
   if (var == NULL) {
-    // todo: add error
+    error(INTERNAL_ERR, "can't allocate memory for variable");
   }
+  var->type = IFJ18_TYPE_NULL;
+  var->var_name = (char *)malloc(20);
+
   ifj18_func_t *func = (ifj18_func_t *)malloc(sizeof(ifj18_func_t));
   if (func == NULL) {
-    // todo: add error
+    error(INTERNAL_ERR, "can't allocate memory for function");
   }
   string *params = malloc(sizeof(string));
   string_init(params);
