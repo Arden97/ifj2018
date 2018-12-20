@@ -71,13 +71,14 @@ int main() {
 
   print_instruction_no_args(".IFJcode18");
 
+  printf("DEFVAR LF@%%retval\n");
+
   printf(
       "LABEL chr\n"
       "PUSHFRAME\n"
       "DEFVAR LF@%%retval\n"
       "DEFVAR LF@param1\n"
       "MOVE LF@param1 LF@%%1\n"
-
       "INT2CHAR LF@%%retval LF@param1\n"
       "POPFRAME\n"
       "RETURN\n\n"
@@ -93,47 +94,87 @@ int main() {
       "POPFRAME\n"
       "RETURN\n\n"
   );
-  //
-  // printf(
-  //     "LABEL substr\n"
-  //     "PUSHFRAME\n"
-  //     "DEFVAR LF@%%retval\n"
-  //     "DEFVAR LF@param1\n"
-  //     "MOVE LF@param1 LF@%%1\n"
-  //     "DEFVAR LF@param2\n"
-  //     "MOVE LF@param1 LF@%%2\n"
-  //     "DEFVAR LF@param2\n"
-  //     "MOVE LF@param1 LF@%%2\n"
-  //     "DEFVAR LF@param3\n"
-  //     "MOVE LF@param1 LF@%%3\n"
-  //
-  //     "STRLEN LF@%%retval LF@param1\n"
-  //
-  // );
 
-  // printf(
-  //     "LABEL ord\n"
-  //     "PUSHFRAME\n"
-  //     "STRLEN LF@$_stack_temp LF@$_arg_0\n"
-  //     "JUMPIFEQ $_assert_zero_end GF@$_stack_temp int@0\n"
-  //     "\n"
-  //     "SUB GF@$_stack_temp GF@$_stack_temp int@1\n"
-  //     "LT GF@$_str_temp_1 LF@$_arg_1 int@0\n"
-  //     "JUMPIFEQ $_assert_zero_end GF@$_str_temp_1 bool@true\n"
-  //     "\n"
-  //     "GT GF@$_str_temp_1 LF@$_arg_1 GF@$_stack_temp\n"
-  //     "JUMPIFEQ $_assert_zero_end GF@$_str_temp_1 bool@true\n"
-  //     "\n"
-  //     "STRI2INT GF@$_stack_temp LF@$_arg_0 LF@$_arg_1\n"
-  //     "JUMP $_asc_end\n"
-  //     "\n"
-  //     "LABEL $_assert_zero_end\n"
-  //     "MOVE GF@$_stack_temp int@0\n"
-  //     "LABEL $_asc_end\n"
-  //     "PUSHS GF@$_stack_temp\n"
-  //     "POPFRAME\n"
-  //     "RETURN\n\n"
-  //     );
+  printf(
+      "LABEL substr\n"
+      "PUSHFRAME\n"
+      "DEFVAR LF@%%retval\n"
+      "DEFVAR LF@param1\n"
+      "MOVE LF@param1 LF@%%1\n"
+      "DEFVAR LF@param2\n"
+      "MOVE LF@param2 LF@%%2\n"
+      "DEFVAR LF@param3\n"
+      "MOVE LF@param3 LF@%%3\n"
+
+      "DEFVAR LF@%%str_temp1\n"
+      "DEFVAR LF@%%str_temp2\n"
+
+      "STRLEN LF@%%str_temp2 LF@param1\n"
+      "JUMPIFEQ %%assert_zero LF@%%str_temp2 int@0\n"
+
+      "LT LF@%%str_temp1 LF@param2 int@1\n"
+      "JUMPIFEQ %%assert_zero LF@%%str_temp1 bool@true\n"
+
+      "LT LF@%%str_temp1 LF@param3 int@0\n"
+      "JUMPIFEQ %%truncate_N LF@%%str_temp1 bool@true\n"
+
+      "SUB LF@%%str_temp1 LF@$str_temp2 LF@param2\n"
+      "GT LF@%%str_temp1 LF@param3 LF@%%str_temp1\n"
+      "JUMPIFEQ %%truncate_N LF@%%str_temp1 bool@true\n"
+      "JUMP %%cycle_start\n"
+
+      "LABEL %%truncate_N\n"
+      "SUB LF@%%str_temp1 LF@%%str_temp2 LF@param2\n"
+      "ADD LF@%%str_temp1 LF@%%str_temp1 int@1\n"
+      "MOVE LF@param3 LF@%%str_temp1\n"
+
+      "LABEL %%cycle_start\n"
+      "SUB LF@param2 LF@param2 int@1\n"
+      "MOVE LF@%%retval string@\n"
+
+      "LABEL %%compare_next\n"
+      "JUMPIFEQ %%all_done LF@param3 int@0\n"
+      "GETCHAR LF@%%str_temp1 LF@param1 LF@param2\n"
+      "CONCAT LF@%%retval LF@%%retval LF@%%str_temp1\n"
+      "ADD LF@param1 LF@param2 int@1\n"
+      "SUB LF@param2 LF@param3 int@1\n"
+      "JUMP %%compare_next\n"
+
+      "LABEL %%assert_zero\n"
+      "MOVE LF@%%retval string@\n"
+
+      "LABEL %%all_done\n"
+      "POPFRAME\n"
+      "RETURN\n\n"
+  );
+
+  printf(
+      "LABEL ord\n"
+      "PUSHFRAME\n"
+
+      "DEFVAR LF@%%retval\n"
+      "DEFVAR LF@param1\n"
+      "MOVE LF@param1 LF@%%1\n"
+      "DEFVAR LF@param2\n"
+      "MOVE LF@param2 LF@%%2\n"
+
+      "STRLEN LF@%%retval LF@param1\n"
+      "JUMPIFEQ %%assert_zero_end LF@%%retval int@0\n"
+      "SUB LF@%%retval LF@%%retval int@1\n"
+      "LT LF@%%str_temp1 LF@param2 int@0\n"
+      "JUMPIFEQ %%assert_zero_end LF@%%str_temp1 bool@true\n"
+      "GT LF@%%str_temp1 LF@param2 LF@%%retval\n"
+      "JUMPIFEQ %%assert_zero_end LF@%%str_temp1 bool@true\n"
+      "STRI2INT LF@%%retval LF@param1 LF@param2\n"
+      "JUMP %%ord_end\n"
+
+      "LABEL %%assert_zero_end\n"
+      "MOVE LF@%%retval int@0\n"
+
+      "LABEL %%ord_end\n"
+      "POPFRAME\n"
+      "RETURN\n\n"
+      );
 
   get_token();
   PROG();

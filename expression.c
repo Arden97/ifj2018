@@ -78,7 +78,7 @@ int is_function() {
 void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *call_function){
   token_prettyprint(token);
   if (!param_found && token->type == TOKEN_RPAREN) {
-      error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
+      error(SYNTAX_ERROR, "closing parenthesis without opening one");
   }
   ifj18_obj_t *argument_id;
   for(int i = 1; i<=call_function->obj_type.func.params_num; ++i){
@@ -86,7 +86,8 @@ void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *c
     switch (token->type) {
       case TOKEN_ID:
         argument_id = find_var(token, act_function);
-        // TODO what should i do with id?
+        printf("MOVE TF@%%%d LF@%s\n", i, token->value->as_string->value);
+        get_token();
         break;
       case TOKEN_INT:
         printf("MOVE TF@%%%d int@%d\n", i, token->value->as_int);
@@ -101,14 +102,19 @@ void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *c
         get_token();
         break;
     }
-    if(token->type == TOKEN_COMMA && i != call_function->obj_type.func.params_num)
+    if(token->type == TOKEN_COMMA && i != call_function->obj_type.func.params_num){
+      get_token();
       continue;
-    else if(token->type != TOKEN_END_OF_LINE && i == call_function->obj_type.func.params_num)
+    }
+    else if(token->type == TOKEN_END_OF_LINE && i != call_function->obj_type.func.params_num)
       error(ARGS_ERROR, "next argument is expected");
+    else if(token->type == TOKEN_RPAREN && !param_found)
+      error(SYNTAX_ERROR, "closing parenthesis without opening one");
   }
 }
 
 int function(ifj18_obj_t *act_function, char *ret_var) {
+    char par = 0;
     ifj18_obj_t *call_func;
     switch (token->type) {
         case TOKEN_INPUTF:
@@ -127,28 +133,65 @@ int function(ifj18_obj_t *act_function, char *ret_var) {
             call_func = ifj18_hash_get((kh_value_t *)global_table, "chr");
             printf("CREATEFRAME\n");
             get_token();
-            call_param_list(act_function, 0, call_func);
+            if(token->type == TOKEN_LPAREN){
+              par = 1;
+              get_token();
+            }
+            call_param_list(act_function, par, call_func);
             printf("CALL %s\n", "chr");
+            printf("MOVE LF@%s TF@%%retval\n", ret_var);
             break;
-        //
-        // case TOKEN_LENGTH:
-        //     //flags[FG_LENGTH] = 1;
-        //     break;
-        //
-        // case TOKEN_SUBSTR:
-        //     //flags[FG_SUBSTR] = 1;
-        //     break;
-        //
-        // case TOKEN_ORD:
-        //     //flags[FG_ORD] = 1;
-        //     break;
-        default:
-            call_func = ifj18_hash_get((kh_value_t *)global_table, token->value->as_string->value);
 
+        case TOKEN_LENGTH:
+            call_func = ifj18_hash_get((kh_value_t *)global_table, "length");
             printf("CREATEFRAME\n");
             get_token();
-            call_param_list(act_function, 0, call_func);
+            if(token->type == TOKEN_LPAREN){
+              par = 1;
+              get_token();
+            }
+            call_param_list(act_function, par, call_func);
+            printf("CALL %s\n", "length");
+            printf("MOVE LF@%s TF@%%retval\n", ret_var);
+            break;
+
+        case TOKEN_SUBSTR:
+            call_func = ifj18_hash_get((kh_value_t *)global_table, "substr");
+            printf("CREATEFRAME\n");
+            get_token();
+            if(token->type == TOKEN_LPAREN){
+              par = 1;
+              get_token();
+            }
+            call_param_list(act_function, par, call_func);
+            printf("CALL %s\n", "substr");
+            printf("MOVE LF@%s TF@%%retval\n", ret_var);
+            break;
+
+        case TOKEN_ORD:
+            call_func = ifj18_hash_get((kh_value_t *)global_table, "ord");
+            printf("CREATEFRAME\n");
+            get_token();
+            if(token->type == TOKEN_LPAREN){
+              par = 1;
+              get_token();
+            }
+            call_param_list(act_function, par, call_func);
+            printf("CALL %s\n", "ord");
+            printf("MOVE LF@%s TF@%%retval\n", ret_var);
+            break;
+
+        default:
+            call_func = ifj18_hash_get((kh_value_t *)global_table, token->value->as_string->value);
+            printf("CREATEFRAME\n");
+            get_token();
+            if(token->type == TOKEN_LPAREN){
+              par = 1;
+              get_token();
+            }
+            call_param_list(act_function, par, call_func);
             printf("CALL %s\n", token->value->as_string->value);
+            printf("MOVE LF@%s TF@%%retval\n", ret_var);
    }
 }
 
