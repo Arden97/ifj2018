@@ -47,12 +47,6 @@ char precedence_table[16][16] = {
                   {'<', '<', '<', '<', '<', ' ', '<', '<', '<', '<', '<', '<', '<', '<', '<', ' '},
 };
 
-char flags[4] = {0, 0, 0, 0};
-#define FG_LENGTH 0
-#define FG_INPUTI 1
-#define FG_INPUTF 2
-#define FG_INPUTS 3
-
 int expression(ifj18_obj_t *func, char *ret_var) {
     if (is_function())
         return function(func, ret_var);
@@ -63,6 +57,7 @@ int expression(ifj18_obj_t *func, char *ret_var) {
 int is_function() {
     ifj18_obj_t *symbol = ifj18_hash_get((kh_value_t *) global_table, token->value->as_string->value);
     switch (token->type) {
+        case TOKEN_SUBSTR:
         case TOKEN_CHR:
         case TOKEN_ORD:
         case TOKEN_PRINT:
@@ -72,7 +67,7 @@ int is_function() {
         case TOKEN_LENGTH:
             return 1;
         default:
-            if (symbol != NULL && symbol->obj_type_flag) {
+            if (symbol != NULL && symbol->obj_type_flag) { // if user's function
                 return 1;
             } else {
                 return 0;
@@ -80,33 +75,81 @@ int is_function() {
     }
 }
 
+void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *call_function){
+  token_prettyprint(token);
+  if (!param_found && token->type == TOKEN_RPAREN) {
+      error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
+  }
+  ifj18_obj_t *argument_id;
+  for(int i = 1; i<=call_function->obj_type.func.params_num; ++i){
+    printf("DEFVAR TF@%%%d\n", i);
+    switch (token->type) {
+      case TOKEN_ID:
+        argument_id = find_var(token, act_function);
+        // TODO what should i do with id?
+        break;
+      case TOKEN_INT:
+        printf("MOVE TF@%%%d int@%d\n", i, token->value->as_int);
+        get_token();
+        break;
+      case TOKEN_FLOAT:
+        printf("MOVE TF@%%%d float@%f\n", i, token->value->as_float);
+        get_token();
+        break;
+      case TOKEN_STRING:
+        printf("MOVE TF@%%%d string@%s\n", i, token->value->as_string->value);
+        get_token();
+        break;
+    }
+    if(token->type == TOKEN_COMMA && i != call_function->obj_type.func.params_num)
+      continue;
+    else if(token->type != TOKEN_END_OF_LINE && i == call_function->obj_type.func.params_num)
+      error(ARGS_ERROR, "next argument is expected");
+  }
+}
+
 int function(ifj18_obj_t *act_function, char *ret_var) {
+    ifj18_obj_t *call_func;
     switch (token->type) {
         case TOKEN_INPUTF:
-            printf("WRITE LF@%s float\n", ret_var);
+            return printf("READ LF@%s float\n", ret_var);
             break;
 
         case TOKEN_INPUTI:
-            printf("WRITE LF@%s int\n", ret_var);
+            return printf("READ LF@%s int\n", ret_var);
             break;
 
         case TOKEN_INPUTS:
-            printf("WRITE LF@%s string\n", ret_var);
+            return printf("READ LF@%s string\n", ret_var);
             break;
 
-        case TOKEN_LENGTH:
-            // return length();
+        case TOKEN_CHR:
+            call_func = ifj18_hash_get((kh_value_t *)global_table, "chr");
+            printf("CREATEFRAME\n");
+            get_token();
+            call_param_list(act_function, 0, call_func);
+            printf("CALL %s\n", "chr");
             break;
+        //
+        // case TOKEN_LENGTH:
+        //     //flags[FG_LENGTH] = 1;
+        //     break;
+        //
+        // case TOKEN_SUBSTR:
+        //     //flags[FG_SUBSTR] = 1;
+        //     break;
+        //
+        // case TOKEN_ORD:
+        //     //flags[FG_ORD] = 1;
+        //     break;
+        default:
+            call_func = ifj18_hash_get((kh_value_t *)global_table, token->value->as_string->value);
 
-        case TOKEN_SUBSTR:
-            // return substr();
-            break;
-
-        case TOKEN_ORD:
-            // return ord();
-            break;
-    }
-
+            printf("CREATEFRAME\n");
+            get_token();
+            call_param_list(act_function, 0, call_func);
+            printf("CALL %s\n", token->value->as_string->value);
+   }
 }
 
 int shift_to_stack(ifj18_token_t *stack_token) {
@@ -386,6 +429,7 @@ int post_to_instr(ifj18_stack_t *postfix_stack, ifj18_obj_t *act_function, char 
 
 int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
     ifj18_token_t *stack_token;
+    ifj18_token_t *prev_token;
 
     unsigned count_of_bracket = 0;
     int sum_count = 1;
@@ -394,12 +438,12 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
     ifj18_stack_t *output_stack = stack_init();
     ifj18_stack_t *infix_stack = stack_init();
 
-    int prev_token = 99; // default
+    //int prev_token = 99; // default
     /// marks, which means end of the expression
     while (token->type != TOKEN_END_OF_LINE && token->type != TOKEN_THEN && token->type != TOKEN_COMMA &&
            token->type != TOKEN_END_OF_FILE) {
         /// operand adds to the output stack with postfix expression
-        if (token->type == TOKEN_ID || token->type == TOKEN_FLOAT || token->type == TOKEN_INT) {
+        if (token->type == TOKEN_ID || token->type == TOKEN_FLOAT || token->type == TOKEN_INT || token->type == TOKEN_STRING) {
             sum_count--;
             // printf("#%d\n", token->value->as_int);
             stack_token = token;
@@ -432,7 +476,6 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
         debug_info("TOKEN PRETTY SPRINT\n");
         token_prettyprint(token);
         get_token();
-
     }
 
     /// relocating eventually hinges on the temporary stack
@@ -446,6 +489,7 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
     /// incorrect count of brackets or operands and operators
     if (count_of_bracket || sum_count)
         error(SYNTAX_ERROR, "error while parsing expressions");
+
 
     debug_info("sumcum: %d\n", operatiobs_ocount);
     /// generating instruction
@@ -461,10 +505,11 @@ ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
         ifj18_obj_t *found = ifj18_hash_get((kh_value_t *) act_function->obj_type.func.local_symtable,
                                             find_token->value->as_string->value);
         /// we did not find
-        if (!ifj18_hash_has((kh_value_t *) act_function->obj_type.func.local_symtable,
-                            find_token->value->as_string->value)) {
-            error(DEFINITION_ERROR, "unknown variable");
-        }
+        // if (!ifj18_hash_has((kh_value_t *) act_function->obj_type.func.local_symtable,
+        //                     find_token->value->as_string->value)) {
+        //     error(DEFINITION_ERROR, "unknown variable");
+        // }
+        if(found == NULL) error(DEFINITION_ERROR, "unknown variable");
 
         return found;
     }

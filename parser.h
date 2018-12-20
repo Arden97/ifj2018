@@ -30,8 +30,5 @@ void PARSE_IF();
 void PARSE_PRINT(ifj18_obj_t *func);
 // int parse_while();
 // int parse_print();
-// int parse_inputf();
-// int parse_inputs();
 
-// int parse_inputi();
 // void PARSE_FUNCTION_CALL();

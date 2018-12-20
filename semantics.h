@@ -50,4 +50,10 @@ ifj18_obj_t *init_func();
 
 struct ifj18_hash_t *global_table;
 
+// char flags[4] = {0, 0, 0, 0};
+// #define FG_LENGTH 0
+// #define FG_SUBSTR 1
+// #define FG_ORD 2
+// #define FG_CHR 3
+
 #endif

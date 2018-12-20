@@ -12,7 +12,7 @@
 #include "semantics.h"
 
 int PROG() {
-    print_instruction_no_args(".IFJcode18");
+    //print_instruction_no_args(".IFJcode18");
     print_instruction_no_args("CREATEFRAME");
     print_instruction_no_args("PUSHFRAME");
     print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
@@ -310,7 +310,7 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "function parameter expected to be identifier");
 
     if (ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value)) {
-        error(SEMANTIC_ERROR, "Implicit declaration of function argument");
+        error(DEFINITION_ERROR, "Implicit declaration of function argument");
     }
 
 
