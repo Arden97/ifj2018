@@ -5,7 +5,6 @@
 // Module:      Stack implementation 	                                           //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "stack.h"

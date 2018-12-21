@@ -5,7 +5,6 @@
 // Module:      Header file of printing token function	                         //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef IFJ18_PP_H

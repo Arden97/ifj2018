@@ -5,7 +5,6 @@
 // Module:      Main module	                                                     //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -26,14 +25,7 @@ int main() {
   global_table = ifj18_hash_new();
   init_list(garbage_list);
 
-  // ifj18_obj_t *tmp = init_var();
-
-  // tmp->obj_type.var.value.as_int = 42;
-  // ifj18_hash_set(global_table, "foo", tmp);
-
-  // printf("%d\n", tmp->obj_type.var.value.as_int);
-  // printf("%d\n", ifj18_hash_has(global_table, "ooo"));
-
+  // Creating creates built-in functions
   ifj18_obj_t *func_length = init_func();
   func_length->obj_type.func.params_num = 1;
   func_length->obj_type.func.return_var->type = IFJ18_TYPE_INT;
@@ -55,24 +47,24 @@ int main() {
   ifj18_hash_set((kh_value_t *)global_table, "chr", func_chr);
 
   ifj18_obj_t *func_inputi = init_func();
-  func_length->obj_type.func.params_num = 0;
-  func_length->obj_type.func.return_var->type = IFJ18_TYPE_INT;
+  func_inputi->obj_type.func.params_num = 0;
+  func_inputi->obj_type.func.return_var->type = IFJ18_TYPE_INT;
   ifj18_hash_set((kh_value_t *)global_table, "inputi", func_inputi);
 
   ifj18_obj_t *func_inputs = init_func();
-  func_length->obj_type.func.params_num = 0;
-  func_length->obj_type.func.return_var->type = IFJ18_TYPE_STRING;
+  func_inputs->obj_type.func.params_num = 0;
+  func_inputs->obj_type.func.return_var->type = IFJ18_TYPE_STRING;
   ifj18_hash_set((kh_value_t *)global_table, "inputs", func_inputs);
 
   ifj18_obj_t *func_inputf = init_func();
-  func_length->obj_type.func.params_num = 0;
-  func_length->obj_type.func.return_var->type = IFJ18_TYPE_FLOAT;
+  func_inputf->obj_type.func.params_num = 0;
+  func_inputf->obj_type.func.return_var->type = IFJ18_TYPE_FLOAT;
   ifj18_hash_set((kh_value_t *)global_table, "inputf", func_inputf);
 
   print_instruction_no_args(".IFJcode18");
+  printf("JUMP MAIN\n\n");
 
-  printf("DEFVAR LF@%%retval\n");
-
+  // Generating code for built-in functions
   printf(
       "LABEL chr\n"
       "PUSHFRAME\n"
@@ -118,7 +110,7 @@ int main() {
       "LT LF@%%str_temp1 LF@param3 int@0\n"
       "JUMPIFEQ %%truncate_N LF@%%str_temp1 bool@true\n"
 
-      "SUB LF@%%str_temp1 LF@$str_temp2 LF@param2\n"
+      "SUB LF@%%str_temp1 LF@%%str_temp2 LF@param2\n"
       "GT LF@%%str_temp1 LF@param3 LF@%%str_temp1\n"
       "JUMPIFEQ %%truncate_N LF@%%str_temp1 bool@true\n"
       "JUMP %%cycle_start\n"
@@ -158,6 +150,9 @@ int main() {
       "DEFVAR LF@param2\n"
       "MOVE LF@param2 LF@%%2\n"
 
+      "DEFVAR LF@%%str_temp1\n"
+      "DEFVAR LF@%%str_temp2\n"
+
       "STRLEN LF@%%retval LF@param1\n"
       "JUMPIFEQ %%assert_zero_end LF@%%retval int@0\n"
       "SUB LF@%%retval LF@%%retval int@1\n"
@@ -174,9 +169,11 @@ int main() {
       "LABEL %%ord_end\n"
       "POPFRAME\n"
       "RETURN\n\n"
-      );
+  );
 
   get_token();
+
+  // Calling the main non-terminal function
   PROG();
 
   return 0;

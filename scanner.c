@@ -5,7 +5,6 @@
 // Module:      Lexical analysis 	                                               //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 

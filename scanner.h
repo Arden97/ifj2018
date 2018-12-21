@@ -5,7 +5,6 @@
 // Module:      Header file of lexical analysis 	                               //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef IFJ18_TOKEN_H
@@ -71,14 +70,22 @@ static inline const char *ifj18_token_type_string(ifj18_token type) {
   return ifj18_token_strings[type];
 }
 
+/*
+ * Reading symbols from stdin and save an apropriate token
+ */
 ifj18_token_t *get_token();
 ifj18_token_t *token;
+
+/*
+ * Determines if token have a correct type, calling an error otherwise
+ */
 void check_token_type(int required_type, int error_type, int inv);
-
-void check_arg(int required_type, char id_allowed);
-
 void check_token_type_msg(int required_type, int error_type, int inv, char *message);
+//void check_arg(int required_type, char id_allowed);
 
+/*
+ * Global macros for parsing expressions later
+ */
 #define FUNC_RETURN_VARNAME "$$_retval"
 #define FUNC_JUMP_AFTER_TEMPLATE "$$__%s_after__$$"
 #define FUNCTION_LABEL_TEMPLATE "$__%s"

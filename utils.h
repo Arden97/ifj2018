@@ -5,7 +5,6 @@
 // Module:      Different tools 	                                               //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef IFJ18_UTIL_H
@@ -23,6 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+/// For debug
 #define KRED "\x1B[31m"
 #define RESET "\033[0m"
 #define KBLU "\x1B[34m"

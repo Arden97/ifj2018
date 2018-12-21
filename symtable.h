@@ -5,7 +5,6 @@
 // Module:      Header file of hash table 	                                     //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef IFJ18_HASH_H
@@ -40,12 +39,23 @@ typedef khash_t(value) ifj18_hash_t;
 
 #define ifj18_hash_size kh_size
 
+/*
+ * Save the object with by "key" in symbol table
+ */
 void ifj18_hash_set(khash_t(value) * self, char *key, ifj18_obj_t *val);
 
+/*
+ * Get the object with by "key" from symbol table
+ */
 ifj18_obj_t *ifj18_hash_get(khash_t(value) * self, char *key);
 
+/*
+ * Returns true if there is an object with "key" in symbol table
+ */
 int ifj18_hash_has(khash_t(value) * self, char *key);
 
 void ifj18_hash_remove(khash_t(value) * self, char *key);
+
+char called_functions[50][50];
 
 #endif

@@ -5,7 +5,6 @@
 // Module:      Header file of Syntax analysis                                   //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "expression.h"
@@ -17,18 +16,23 @@
 #include "utils.h"
 #include <stdio.h>
 
+/// Main function, which calling another non-terminals
 int PROG();
+
+/// Non-terminal function which parse function definition
 int DEFINE_FUNCTION();
-// int STATEMENT_LIST(ifj18_obj_t *func);
-int STATEMENT(ifj18_obj_t *func);
-// int CALL_ASIGN();
+
+/// Non-terminal function which parse function parametrs
 void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters);
-// int NEXT_PARAM();
-// int parse_id();
-void PARSE_IF();
 
+/// Non-terminal function which parse statements of IFJ18
+int STATEMENT(ifj18_obj_t *func);
+
+/// Parsing while statement
+void PARSE_WHILE(ifj18_obj_t *func);
+
+/// Parsing if statement
+void PARSE_IF(ifj18_obj_t *func);
+
+/// Parse print statement
 void PARSE_PRINT(ifj18_obj_t *func);
-// int parse_while();
-// int parse_print();
-
-// void PARSE_FUNCTION_CALL();

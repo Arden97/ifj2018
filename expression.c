@@ -5,13 +5,11 @@
 // Module:      Predence analysis	                                               //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "expression.h"
 #include "semantics.h"
 
-// #define apply_on_new_token(stat) get_token();stat
 char precedence_table[16][16] = {
         /*            +    -    *    /    (    )    \    <    >   <=   >=    =   <>   id   lit   $ */
         /*  +  */ {'>', '>', '<', '<', '<', '>', '<', '>', '>', '>', '>', '>', '>', '<', '<', '>'},
@@ -81,7 +79,7 @@ void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *c
       error(SYNTAX_ERROR, "closing parenthesis without opening one");
   }
   ifj18_obj_t *argument_id;
-  for(int i = 1; i<=call_function->obj_type.func.params_num; ++i){
+  for(int i = 1; i<call_function->obj_type.func.params_num+1; i++){
     printf("DEFVAR TF@%%%d\n", i);
     switch (token->type) {
       case TOKEN_ID:
@@ -106,16 +104,20 @@ void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *c
       get_token();
       continue;
     }
-    else if(token->type == TOKEN_END_OF_LINE && i != call_function->obj_type.func.params_num)
+    else if((token->type == TOKEN_END_OF_LINE && i != call_function->obj_type.func.params_num) ||
+            (token->type == TOKEN_RPAREN && i != call_function->obj_type.func.params_num))
       error(ARGS_ERROR, "next argument is expected");
     else if(token->type == TOKEN_RPAREN && !param_found)
       error(SYNTAX_ERROR, "closing parenthesis without opening one");
+    else if(token->type == TOKEN_COMMA && i == call_function->obj_type.func.params_num)
+      error(ARGS_ERROR, "too many arguments");
   }
 }
 
 int function(ifj18_obj_t *act_function, char *ret_var) {
     char par = 0;
     ifj18_obj_t *call_func;
+    char *func_name;
     switch (token->type) {
         case TOKEN_INPUTF:
             return printf("READ LF@%s float\n", ret_var);
@@ -184,14 +186,15 @@ int function(ifj18_obj_t *act_function, char *ret_var) {
         default:
             call_func = ifj18_hash_get((kh_value_t *)global_table, token->value->as_string->value);
             printf("CREATEFRAME\n");
+            func_name = token->value->as_string->value;
             get_token();
             if(token->type == TOKEN_LPAREN){
               par = 1;
               get_token();
             }
             call_param_list(act_function, par, call_func);
-            printf("CALL %s\n", token->value->as_string->value);
-            printf("MOVE LF@%s TF@%%retval\n", ret_var);
+            printf("CALL $__%s\n", func_name);
+            printf("MOVE LF@%s TF@$$_retval\n", ret_var);
    }
 }
 
@@ -232,8 +235,6 @@ void psa_operation(ifj18_stack_t *operators_stack, ifj18_stack_t *output_stack, 
     /// case for empty stack, marks in precedence table or left bracket
     if (stack_empty(operators_stack) || shift_to_stack(stack_token) || stack_token->type == TOKEN_LPAREN) {
         stack_token = token;
-        // debug_info("#Current token in psa: ");
-        //        token_prettyprint(stack_token);
         stack_push(operators_stack, stack_token);
     } else {
         /// have to marks of reduction in the table and stack dont have to be empty
@@ -481,16 +482,13 @@ int inf_to_post(ifj18_obj_t *act_function, char *ret_var) {
     ifj18_stack_t *output_stack = stack_init();
     ifj18_stack_t *infix_stack = stack_init();
 
-    //int prev_token = 99; // default
     /// marks, which means end of the expression
-    while (token->type != TOKEN_END_OF_LINE && token->type != TOKEN_THEN && token->type != TOKEN_COMMA &&
+    while (token->type != TOKEN_END_OF_LINE && token->type != TOKEN_THEN && token->type != TOKEN_COMMA && token->type != TOKEN_DO &&
            token->type != TOKEN_END_OF_FILE) {
         /// operand adds to the output stack with postfix expression
         if (token->type == TOKEN_ID || token->type == TOKEN_FLOAT || token->type == TOKEN_INT || token->type == TOKEN_STRING) {
             sum_count--;
-            // printf("#%d\n", token->value->as_int);
             stack_token = token;
-            // printf("#%d\n", stack_token->value->as_int);
             stack_push(output_stack, stack_token);
         }
             /// left bracket adds to the temporary stack
@@ -548,10 +546,6 @@ ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function) {
         ifj18_obj_t *found = ifj18_hash_get((kh_value_t *) act_function->obj_type.func.local_symtable,
                                             find_token->value->as_string->value);
         /// we did not find
-        // if (!ifj18_hash_has((kh_value_t *) act_function->obj_type.func.local_symtable,
-        //                     find_token->value->as_string->value)) {
-        //     error(DEFINITION_ERROR, "unknown variable");
-        // }
         if(found == NULL) error(DEFINITION_ERROR, "unknown variable");
 
         return found;

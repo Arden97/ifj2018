@@ -5,7 +5,6 @@
 // Module:      Header file of Stack implementation 	                           //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef STACK_H

@@ -5,14 +5,13 @@
 // Module:      Syntax analysis (Recursive descent) 	                           //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "parser.h"
 #include "semantics.h"
 
 int PROG() {
-    //print_instruction_no_args(".IFJcode18");
+    printf("LABEL MAIN\n");
     print_instruction_no_args("CREATEFRAME");
     print_instruction_no_args("PUSHFRAME");
     print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
@@ -62,10 +61,9 @@ int DEFINE_FUNCTION() {
 
     debug_info("Check hash_has\n");
 
-
-    if (ifj18_hash_has((kh_value_t *) global_table, token->value->as_string->value)) {
-        printf("inside of hash_has error\n");
-        error(SEMANTIC_ERROR, "ID has been defined already");
+    ifj18_obj_t *check = ifj18_hash_get((kh_value_t *)global_table, token->value->as_string->value);
+    if (check != NULL) {
+        error(DEFINITION_ERROR, "Function has been defined already");
     }
 
     debug_info("Set hash funct\n");
@@ -74,7 +72,7 @@ int DEFINE_FUNCTION() {
 
     ifj18_hash_set((kh_value_t *) global_table, func_name, func);
 
-    debug_info("Hash function set %d\n", ifj18_hash_has((kh_value_t *) global_table, func_name));
+    //debug_info("Hash function set %d\n", ifj18_hash_has((kh_value_t *) global_table, func_name));
 
     get_token();
 
@@ -106,6 +104,7 @@ int DEFINE_FUNCTION() {
 
     for (int i = 0; i < func->obj_type.func.params_num; i++) {
         debug_info("parameters[%d] %s\n", i, parameters[i]->value);
+        print_instruction("DEFVAR", "LF@%s\n", parameters[i]->value);
         print_instruction("MOVE", "LF@%s LF@%%%d\n", parameters[i]->value, i + 1);
     }
 
@@ -133,6 +132,7 @@ int DEFINE_FUNCTION() {
 
 int STATEMENT(ifj18_obj_t *func) {
     debug_info("Inside of STATEMENT function");
+    ifj18_obj_t *check;
     token_prettyprint(token);
     char *token_id_name;
     char if_complete = 0;
@@ -146,7 +146,11 @@ int STATEMENT(ifj18_obj_t *func) {
                 token_id_name = token->value->as_string->value;
                 get_token();
                 if (token->type == TOKEN_OP_ASSIGN) {
-                    print_instruction("DEFVAR", "LF@%s\n", token_id_name);
+                    check = ifj18_hash_get(func->obj_type.func.local_symtable, token_id_name);
+                    if (check == NULL){ // variable was not defined in this function
+                      print_instruction("DEFVAR", "LF@%s\n", token_id_name);
+                    }
+
                     debug_info("Sent LF@%s as variable to save expr\n", token_id_name);
                     get_token();
                     int type = expression(func, token_id_name);
@@ -166,6 +170,8 @@ int STATEMENT(ifj18_obj_t *func) {
             case TOKEN_DEF:
                 return TOKEN_DEF;
             case TOKEN_WHILE:
+                PARSE_WHILE(func);
+                break;
             case TOKEN_PRINT:
                 PARSE_PRINT(func);
                 break;
@@ -218,10 +224,12 @@ void PARSE_PRINT(ifj18_obj_t *func) {
         parmas:
 
         printf("WRITE ");
+        ifj18_obj_t *check;
         switch (token->type) {
             case TOKEN_ID:
-                if (!ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value)){
-                    error(SEMANTIC_ERROR, "Variable not defined");
+                check = ifj18_hash_get((kh_value_t *)func->obj_type.func.local_symtable, token->value->as_string->value);
+                if (check == NULL){
+                    error(DEFINITION_ERROR, "Variable is not defined");
                 }
             case TOKEN_STRING:
                 printf("%s@%s", get_3ac_token_type(), token->value->as_string->value);
@@ -237,7 +245,6 @@ void PARSE_PRINT(ifj18_obj_t *func) {
 
         print_instruction("\nWRITE", "\\010\n");
         get_token();
-
 
         if (token->type == TOKEN_COMMA) {
             get_token();
@@ -299,6 +306,29 @@ void PARSE_IF(ifj18_obj_t *func) {
 
 }
 
+void PARSE_WHILE(ifj18_obj_t *func){
+  static int while_count = 0;
+  while_count++;
+
+  get_token();
+  expression(func, COND_EXPR_RESULT_VARNAME);
+
+  print_instruction("JUMPIFEQ", "$$_WHILE_STATEMENT_%d LF@%s bool@true\n", while_count, COND_EXPR_RESULT_VARNAME);
+  print_instruction("JUMPIFNEQ", "$$_WHILE_AFTER_%d LF@%s bool@true\n", while_count, COND_EXPR_RESULT_VARNAME);
+
+  check_token_type(TOKEN_DO, SYNTAX_ERROR, 1);
+  get_token();
+  print_instruction("LABEL", "$$_WHILE_STATEMENT_%d\n", while_count);
+
+  if (STATEMENT(func) != TOKEN_END) {
+      error(SYNTAX_ERROR, "Expected end");
+  }
+  print_instruction("JUMPIFEQ", "$$_WHILE_STATEMENT_%d LF@%s bool@true\n", while_count, COND_EXPR_RESULT_VARNAME);
+  print_instruction("JUMPIFNEQ", "$$_WHILE_AFTER_%d LF@%s bool@true\n", while_count, COND_EXPR_RESULT_VARNAME);
+  print_instruction("LABEL", "$$_WHILE_AFTER_%d\n", while_count);
+  get_token();
+}
+
 void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     token_prettyprint(token);
     if (!param_found && token->type == TOKEN_RPAREN) {
@@ -309,12 +339,14 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
 
     check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "function parameter expected to be identifier");
 
-    if (ifj18_hash_has((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value)) {
+
+    ifj18_obj_t *check = ifj18_hash_get((kh_value_t *)func->obj_type.func.local_symtable, token->value->as_string->value);
+    if (check != NULL) {
         error(DEFINITION_ERROR, "Implicit declaration of function argument");
     }
 
-
-    ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value, NULL);
+    ifj18_obj_t *object = init_var();
+    ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value, object);
 
 
     parameters[func->obj_type.func.params_num++] = token->value->as_string;
@@ -323,7 +355,7 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
 
     if (token->type == TOKEN_COMMA) {
         get_token();
-        check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Expecting identifier after comma");
+        check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Expecting an identifier after comma");
     }
 
     PARAM_LIST(func, param_found, parameters);

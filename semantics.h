@@ -5,7 +5,6 @@
 // Module:      Header file of Semantic control	                                 //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef IFJ18_SEMANTICS_H
@@ -45,15 +44,12 @@ typedef struct ifj18_obj_t {
   int obj_type_flag; // 1 - func, 0 - var
 } ifj18_obj_t;
 
+/// Creates a variable object
 ifj18_obj_t *init_var();
+
+/// Creates a function object
 ifj18_obj_t *init_func();
 
 struct ifj18_hash_t *global_table;
-
-// char flags[4] = {0, 0, 0, 0};
-// #define FG_LENGTH 0
-// #define FG_SUBSTR 1
-// #define FG_ORD 2
-// #define FG_CHR 3
 
 #endif

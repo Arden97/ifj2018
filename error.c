@@ -5,7 +5,6 @@
 // Module:      Error states	                                                   //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
-//              Alexandr Demicev    (xdemic00)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "error.h"
@@ -50,9 +49,6 @@ char  *error_msg(int error_code){
       err_msg = "UnknownError";
       break;
   }
-//  fprintf(stderr,RESET);
-//  printf(RESET);
-//  fprintf(stderr, "%s%s. Message:  %s\n%s", KRED,err_msg, details,RESET);
 
   return err_msg;
 }
@@ -68,6 +64,6 @@ void error(int error_code, const char *format, ...){
     va_end (ap);
 
     fprintf(stderr, "%s\n", RESET);
-//  gc_dispose();
+// gc_dispose();
   exit(error_code);
 }
