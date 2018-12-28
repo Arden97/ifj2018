@@ -21,7 +21,7 @@
 int expression(ifj18_obj_t *func, char *ret_var);
 
 /// Determines if we dealing with built-in or user's function
-int is_function();
+int is_function(ifj18_obj_t *func);
 
 /// Generating code for built-in or user's function parametrs
 void call_param_list(ifj18_obj_t *act_function, char param_found, ifj18_obj_t *call_function);
@@ -42,7 +42,7 @@ void do_until_left_bracket(ifj18_stack_t *operators_stack, ifj18_stack_t *output
 void print_operation_operand(ifj18_obj_t *operand, char *prefix, int type);
 
 /// Converting an operand for to an appropriate type
-void convert_operand(ifj18_obj_t *operand);
+void convert_operand(ifj18_obj_t *operand, int oprnd_num);
 
 /// Generating an appropriate prefix for given object
 char *get_bytecode_objtype(ifj18_obj_t *operand);
@@ -58,8 +58,8 @@ ifj18_obj_t *find_var(ifj18_token_t *find_token, ifj18_obj_t *act_function);
 
 /// Generating code from given parametrs
 void generate_3ac_expressions(char *prefix_1, ifj18_obj_t *operand_1, char *prefix_2, ifj18_obj_t *operand_2,
-                              ifj18_obj_t *tmp_var_obj,
+                              ifj18_obj_t *tmp_var_obj, ifj18_obj_t *func,
                               ifj18_var type1, ifj18_var type2, char *operation, int operations_count);
 
 /// Determines and set object type of given variable or primitive and push it in to operands stack
-void set_object_value(ifj18_token_t *token_d, ifj18_obj_t *func, ifj18_stack_t *stack);
+void set_object_value(ifj18_token_t *token_d, ifj18_obj_t *func, ifj18_stack_t *stack, char *ret_var);

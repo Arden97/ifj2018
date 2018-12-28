@@ -18,7 +18,7 @@ ifj18_obj_t *init_var() {
   }
 
   var->type = IFJ18_TYPE_NULL;
-  var->var_name = (char *)malloc(20);
+  var->var_name = (char *)malloc(128);
 
   ifj18_obj_t *obj_var = (ifj18_obj_t *)malloc(sizeof(ifj18_obj_t));
   obj_var->obj_type.var = *var;
@@ -32,7 +32,7 @@ ifj18_obj_t *init_func() {
     error(INTERNAL_ERROR, "can't allocate memory for variable");
   }
   var->type = IFJ18_TYPE_NULL;
-  var->var_name = (char *)malloc(20);
+  var->var_name = (char *)malloc(128);
 
   ifj18_func_t *func = (ifj18_func_t *)malloc(sizeof(ifj18_func_t));
   if (func == NULL) {
@@ -43,6 +43,7 @@ ifj18_obj_t *init_func() {
   func->sparams = params;
   func->return_var = var;
   func->params_num = 0;
+  func->func_name = (char *)malloc(128);
   func->local_symtable = ifj18_hash_new();
 
   ifj18_obj_t *obj_func = (ifj18_obj_t *)malloc(sizeof(ifj18_obj_t));

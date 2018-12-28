@@ -31,6 +31,7 @@ typedef struct ifj18_var_t {
 
 typedef struct ifj18_func_t {
   struct ifj18_hash_t *local_symtable;
+  char *func_name;
   int params_num;
   string *sparams;
   ifj18_var_t *return_var;

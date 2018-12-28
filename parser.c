@@ -15,10 +15,15 @@ int PROG() {
     print_instruction_no_args("CREATEFRAME");
     print_instruction_no_args("PUSHFRAME");
     print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
+    print_instruction("MOVE", "LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
     print_instruction("DEFVAR", "LF@%s\n", COND_EXPR_RESULT_VARNAME);
+    print_instruction("MOVE", "LF@%s nil@nil\n", COND_EXPR_RESULT_VARNAME);
+    print_instruction("DEFVAR", "GF@%s1\n", TEMP_EXP_CONVERTION_VARNAME);
+    print_instruction("DEFVAR", "GF@%s2\n", TEMP_EXP_CONVERTION_VARNAME);
     debug_info("start PROG\n");
     token_prettyprint(token);
     ifj18_obj_t *main_func = init_func();
+    main_func->obj_type.func.func_name = "main";
     debug_info("init_func() complete\n");
     int statement_return;
     while (1) {
@@ -48,7 +53,7 @@ int PROG() {
 }
 
 int DEFINE_FUNCTION() {
-    char paren_found = 0;
+    char paren_found = 1;
     debug_info("Start define_function()\n");
     ifj18_obj_t *func = init_func();
     debug_info("init_func() complete \n");
@@ -69,19 +74,19 @@ int DEFINE_FUNCTION() {
     debug_info("Set hash funct\n");
 
     char *func_name = token->value->as_string->value;
+    func->obj_type.func.func_name = token->value->as_string->value;
 
     ifj18_hash_set((kh_value_t *) global_table, func_name, func);
 
     //debug_info("Hash function set %d\n", ifj18_hash_has((kh_value_t *) global_table, func_name));
 
     get_token();
-
-    if (token->type == TOKEN_LPAREN) {
-        paren_found = 1;
-        get_token();
+    if (token->type != TOKEN_LPAREN) {
+      error(SYNTAX_ERROR, "left paren expected");
     }
-    string *parameters[30];
+    get_token();
 
+    string *parameters[30];
 
     PARAM_LIST(func, paren_found, parameters);
 
@@ -100,11 +105,13 @@ int DEFINE_FUNCTION() {
 
     print_instruction("DEFVAR", "LF@%s\n", FUNC_RETURN_VARNAME);
     print_instruction("DEFVAR", "LF@%s\n", COND_EXPR_RESULT_VARNAME);
+    print_instruction("MOVE", "LF@%s nil@nil\n", COND_EXPR_RESULT_VARNAME);
     print_instruction("MOVE", "LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
 
     for (int i = 0; i < func->obj_type.func.params_num; i++) {
         debug_info("parameters[%d] %s\n", i, parameters[i]->value);
         print_instruction("DEFVAR", "LF@%s\n", parameters[i]->value);
+        print_instruction("DEFVAR", "GF@$$_expr_res_%s$$%s\n", func->obj_type.func.func_name, parameters[i]->value);
         print_instruction("MOVE", "LF@%s LF@%%%d\n", parameters[i]->value, i + 1);
     }
 
@@ -133,7 +140,9 @@ int DEFINE_FUNCTION() {
 int STATEMENT(ifj18_obj_t *func) {
     debug_info("Inside of STATEMENT function");
     ifj18_obj_t *check;
+    int id_len;
     token_prettyprint(token);
+    int type = 0;
     char *token_id_name;
     char if_complete = 0;
     while (1) {
@@ -143,24 +152,48 @@ int STATEMENT(ifj18_obj_t *func) {
             case TOKEN_END_OF_LINE:
                 break;
             case TOKEN_ID:
+                id_len = strlen(token->value->as_string->value)-1;
                 token_id_name = token->value->as_string->value;
+
+                if(strcmp(token_id_name, "def") == 0  ||
+                   strcmp(token_id_name, "do") == 0   ||
+                   strcmp(token_id_name, "else") == 0 ||
+                   strcmp(token_id_name, "end") == 0  ||
+                   strcmp(token_id_name, "if") == 0   ||
+                   strcmp(token_id_name, "not") == 0  ||
+                   strcmp(token_id_name, "nil") == 0  ||
+                   strcmp(token_id_name, "then") == 0 ||
+                   strcmp(token_id_name, "while") == 0) error(SYNTAX_ERROR, "Unexpected key word");
+
                 get_token();
                 if (token->type == TOKEN_OP_ASSIGN) {
                     check = ifj18_hash_get(func->obj_type.func.local_symtable, token_id_name);
                     if (check == NULL){ // variable was not defined in this function
                       print_instruction("DEFVAR", "LF@%s\n", token_id_name);
+                      print_instruction("DEFVAR", "GF@$$_expr_res_%s$$%s\n", func->obj_type.func.func_name, token_id_name);
+                      print_instruction("MOVE", "LF@%s nil@nil\n", token_id_name);
                     }
+
+                    if(token_id_name[id_len] == '?' || token_id_name[id_len] == '!')
+                      error(LEXICAL_ERROR, "variable id should not end with ! or ?");
 
                     debug_info("Sent LF@%s as variable to save expr\n", token_id_name);
                     get_token();
-                    int type = expression(func, token_id_name);
+                    type = expression(func, token_id_name);
+                    print_instruction("MOVE", "GF@$$_expr_res_%s$$%s " "LF@%s\n", func->obj_type.func.func_name, token_id_name, token_id_name);
                     print_instruction("MOVE", "LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
+
                     ifj18_obj_t *obj = init_var();
                     obj->obj_type.var.type = type;
                     obj->obj_type.var.var_name = token_id_name;
-
                     ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token_id_name, obj);
-                } else {
+                }
+                else if(token->type == TOKEN_END_OF_LINE || token->type == TOKEN_END_OF_FILE){
+                    check = ifj18_hash_get(func->obj_type.func.local_symtable, token_id_name);
+                    if (check == NULL) error(DEFINITION_ERROR, "unknown variable");
+                    print_instruction("MOVE", "LF@%s LF@%s\n", FUNC_RETURN_VARNAME, token_id_name);
+                }
+                else {
                     expression(func, FUNC_RETURN_VARNAME);
                 }
                 break;
@@ -200,19 +233,21 @@ char *get_3ac_token_type() {
             return "LF";
         case TOKEN_FLOAT:
             return "float";
+        case TOKEN_NIL:
+            return "nil";
     }
 }
 
 
 void PARSE_PRINT(ifj18_obj_t *func) {
-    int param_found = 0;
-    int param_count = 0;
-    get_token();
+  int param_found = 0;
+  int param_count = 0;
+  get_token();
 
-    if (token->type == TOKEN_LPAREN) {
-        param_found = 1;
-        get_token();
-    }
+  if (token->type == TOKEN_LPAREN) {
+      param_found = 1;
+      get_token();
+  }
 
     while (1) {
         param_count++;
@@ -238,12 +273,14 @@ void PARSE_PRINT(ifj18_obj_t *func) {
                 printf("%s@%d", get_3ac_token_type(), token->value->as_int);
                 break;
             case TOKEN_FLOAT:
-                printf("%s@%f", get_3ac_token_type(), token->value->as_float);
+                printf("%s@%a", get_3ac_token_type(), token->value->as_float);
                 break;
+            case TOKEN_NIL:
+                printf("string@");
 
         }
 
-        print_instruction("\nWRITE", "\\010\n");
+        print_instruction("\nWRITE", "string@\\010\n");
         get_token();
 
         if (token->type == TOKEN_COMMA) {
@@ -253,12 +290,15 @@ void PARSE_PRINT(ifj18_obj_t *func) {
         else if(token->type  == TOKEN_RPAREN || token->type == TOKEN_END_OF_LINE){
             return;
         }
+        else if(!param_found && token->type == TOKEN_RPAREN) {
+            error(SYNTAX_ERROR, "Closing parenthesis without opening one.");
+        }
         else{
             error(SYNTAX_ERROR, "Unknown token");
         }
 
     }
-
+    print_instruction("MOVE", "LF@%s nil@nil\n", FUNC_RETURN_VARNAME);
 }
 
 
@@ -346,7 +386,9 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     }
 
     ifj18_obj_t *object = init_var();
+    //object->obj_type.var.var_name = token->value->as_string->value;
     ifj18_hash_set((kh_value_t *) func->obj_type.func.local_symtable, token->value->as_string->value, object);
+    //print_instruction("DEFVAR", "GF@$$_expr_res_%s$$%s\n", func->obj_type.func.func_name, object->obj_type.var.var_name);
 
 
     parameters[func->obj_type.func.params_num++] = token->value->as_string;
@@ -356,6 +398,9 @@ void PARAM_LIST(ifj18_obj_t *func, char param_found, string **parameters) {
     if (token->type == TOKEN_COMMA) {
         get_token();
         check_token_type_msg(TOKEN_ID, SYNTAX_ERROR, 1, "Expecting an identifier after comma");
+    }
+    else if(token->type != TOKEN_RPAREN){
+        error(SYNTAX_ERROR, "expected right paren or comma");
     }
 
     PARAM_LIST(func, param_found, parameters);

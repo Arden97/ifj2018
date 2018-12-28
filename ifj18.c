@@ -91,6 +91,7 @@ int main() {
       "LABEL substr\n"
       "PUSHFRAME\n"
       "DEFVAR LF@%%retval\n"
+      "MOVE LF@%%retval string@\n"
       "DEFVAR LF@param1\n"
       "MOVE LF@param1 LF@%%1\n"
       "DEFVAR LF@param2\n"

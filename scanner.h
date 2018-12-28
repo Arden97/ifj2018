@@ -26,7 +26,7 @@
           t(OP_DIV, "DIV") t(OP_LT, "LT") t(OP_GT, "GT") t(OP_LTE, "<=") t(OP_GTE, ">=") t(OP_ASSIGN, "=") t(OP_NEQ, "!=") t(INT, "int")   \
               t(FLOAT, "float") t(STRING, "string") t(END_OF_FILE, "EOF") t(END_OF_LINE, "EOL") t(LENGTH, "length") t(LPAREN, "(")         \
                   t(RPAREN, ")") t(OP_NOT, "!") t(COMMA, ",") t(OP_DOT, ".") t(SUBSTR, "substr") t(OP_EQ, "EQ") t(ORD, "ord")              \
-                      t(OP_AND, "&&") t(OP_OR, "||") t(EOS, "end-of-source") t(ILLEGAL, "illegal") t(CHR, "chr")
+                      t(OP_AND, "&&") t(OP_OR, "||") t(EOS, "end-of-source") t(ILLEGAL, "illegal") t(CHR, "chr") t(NIL, "nil")
 
 /*
  * Tokens enum.
