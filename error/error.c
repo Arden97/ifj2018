@@ -9,8 +9,6 @@
 
 #include "error.h"
 
-
-
 char  *error_msg(int error_code){
   char *err_msg;
   switch(error_code){
@@ -56,7 +54,7 @@ char  *error_msg(int error_code){
 void error(int error_code, const char *format, ...){
     fprintf(stderr,RESET);
     printf(RESET);
-    fprintf(stderr, "%s%s. ", KRED,error_msg(error_code));
+    fprintf(stderr, "%s%s. ", KRED, error_msg(error_code));
 
     va_list ap;
     va_start (ap, format);
@@ -64,6 +62,6 @@ void error(int error_code, const char *format, ...){
     va_end (ap);
 
     fprintf(stderr, "%s\n", RESET);
-// gc_dispose();
-  exit(error_code);
+    // gc_dispose();
+    exit(error_code);
 }

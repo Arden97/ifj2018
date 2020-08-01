@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "expression.h"
-#include "semantics.h"
 
 char precedence_table[16][16] = {
         /*            +    -    *    /    (    )    \    <    >   <=   >=    =   <>   id   lit   $ */

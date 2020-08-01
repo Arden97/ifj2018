@@ -2,19 +2,16 @@
 // School:      Brno University of Technology, Faculty of Information Technology //
 // Course:      Formal Languages and Compilers                                   //
 // Project:     IFJ18                                                            //
-// Module:      Header file of predence analysis 	                               //
+// Module:      Header file of predence analysis 	                             //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "error.h"
-#include "scanner.h"
-#include "semantics.h"
-#include "stack.h"
-#include "strlib.h"
-#include "symtable.h"
-#include "prettyprint.h"
-#include "semantics.h"
+#include "../scanner/scanner.h"
+#include "../semantics/semantics.h"
+#include "../utils/stack.h"
+#include "../utils/strlib.h"
+#include "../utils/prettyprint.h"
 #include <stdlib.h>
 
 /// Determines the type of expression an calling appropriate function

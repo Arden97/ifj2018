@@ -9,23 +9,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "gc.h"
-#include "parser.h"
-#include "prettyprint.h"
-#include "scanner.h"
-#include "semantics.h"
+#include "gc/gc.h"
+#include "parser/parser.h"
 
 int main() {
   if ((garbage_list = malloc(sizeof(tList))) == NULL) {
-    fprintf(stderr, "InternalError: Memory Allocation has failed\n");
-    exit(99);
+    error(INTERNAL_ERROR, "can't allocate memory for garbage colector");
   }
-
-  global_table = ifj18_hash_new();
   init_list(garbage_list);
 
-  // Creating creates built-in functions
+  global_table = ifj18_hash_new();
+
+  // Creating built-in functions
   ifj18_obj_t *func_length = init_func();
   func_length->obj_type.func.params_num = 1;
   func_length->obj_type.func.return_var->type = IFJ18_TYPE_INT;

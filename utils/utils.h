@@ -7,11 +7,9 @@
 //              Volodymyr Piskun    (xpisku03)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef IFJ18_UTIL_H
+#ifndef IFJ18_UTILS_H
+#define IFJ18_UTILS_H
 
-#define IFJ18_UTIL_H
-
-#include "utils.h"
 #include <assert.h>
 #include <fcntl.h>
 #include <stdarg.h>
@@ -30,14 +28,10 @@
 #define KYEL "\e[33m"
 
 size_t file_size(FILE *handle);
-
 char *file_read(const char *filename);
-
 char *read_until_eof(FILE *stream);
-
 void debug_info(const char *format, ...);
 void debug_info_unwrapped(const char *format, ...);
-
 void print_instruction(char *instruction, const char *format, ...);
 void print_instruction_no_args(char *instruction);
 #endif

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include "../scanner.h"
+#include "../scanner/scanner.h"
 
 char *print_buf;
 

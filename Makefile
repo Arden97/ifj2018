@@ -1,14 +1,13 @@
-SRC=$(wildcard *.c)
+SRC=./main.c $(wildcard */*.c)
 OBJ=${SRC:.c=.o}
 
 CC=clang
 PREFIX=/usr/local
 CFLAGS=-std=c99 -g -O0 -Wno-parentheses -Wno-switch-enum -Wno-unused-value
-CFLAGS+=-Wno-switch
 LDFLAGS+=-lm
 
 # test
-TEST_SRC=$(shell find *.c test/*.c | sed '/ifj18/d')
+TEST_SRC=$(shell find */*.c test/*.c | sed '/ifj18/d')
 TEST_OBJ=${TEST_SRC:.c=.o}
 
 CFLAGS+=-I src
@@ -24,6 +23,8 @@ $(OUT): $(OBJ)
 	@$(CC) -c $(CFLAGS) $< -o $@
 	@printf "\e[36mCC\e[90m %s\e[0m\n" $@
 
+.PHONY: clean test install uninstall
+
 test: test_runner
 	@./$<
 
@@ -38,5 +39,3 @@ uninstall:
 
 clean:
 	rm -f ifj18 test_runner $(OBJ) $(TEST_OBJ)
-
-.PHONY: clean test install uninstall

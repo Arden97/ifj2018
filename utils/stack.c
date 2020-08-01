@@ -2,18 +2,12 @@
 // School:      Brno University of Technology, Faculty of Information Technology //
 // Course:      Formal Languages and Compilers                                   //
 // Project:     IFJ18                                                            //
-// Module:      Stack implementation 	                                           //
+// Module:      Stack implementation 	                                         //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "stack.h"
-#include "error.h"
-#include "prettyprint.h"
-#include "scanner.h"
-#include "semantics.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 #define DEBUG
 

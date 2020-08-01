@@ -1,3 +1,4 @@
+
 ///////////////////////////////////////////////////////////////////////////////////
 // School:      Brno University of Technology, Faculty of Information Technology //
 // Course:      Formal Languages and Compilers                                   //
@@ -11,8 +12,7 @@ typedef struct tListElement {
   void *val;
   struct tListElement *lptr;
   struct tListElement *rptr;
-
-} * tListElementPtr;
+} *tListElementPtr;
 
 typedef struct tList {
   tListElementPtr First;
@@ -21,5 +21,4 @@ typedef struct tList {
 } tList;
 
 void *copy_last(tList *L);
-
 void init_list(tList *L);

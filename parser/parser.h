@@ -7,13 +7,9 @@
 //              Volodymyr Piskun    (xpisku03)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "expression.h"
-#include "prettyprint.h"
-#include "scanner.h"
-#include "semantics.h"
+#include "../expression/expression.h"
+#include "../utils/utils.h"
 #include "stdlib.h"
-#include "symtable.h"
-#include "utils.h"
 #include <stdio.h>
 
 /// Main function, which calling another non-terminals

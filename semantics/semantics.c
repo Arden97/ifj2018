@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "semantics.h"
-#include "symtable.h"
-#include "strlib.h"
 
 ifj18_obj_t *init_var() {
   ifj18_var_t *var = (ifj18_var_t *)malloc(sizeof(ifj18_var_t));
@@ -51,4 +49,28 @@ ifj18_obj_t *init_func() {
   obj_func->obj_type_flag = 1;
 
   return obj_func;
+}
+
+inline void ifj18_hash_set(khash_t(value) * self, char *key, ifj18_obj_t *val) {
+  int ret;
+  khiter_t k = kh_put(value, self, key, &ret);
+  kh_value(self, k) = val;
+}
+
+inline ifj18_obj_t *ifj18_hash_get(khash_t(value) * self, char *key) {
+  khiter_t k = kh_get(value, self, key);
+  return k == kh_end(self) ? NULL : kh_value(self, k);
+}
+
+inline int ifj18_hash_has(khash_t(value) * self, char *key) {
+  khiter_t k = kh_get(value, self, key);
+  if (k == NULL) {
+    return 0;
+  }
+  return kh_exist(self, k);
+}
+
+void ifj18_hash_remove(khash_t(value) * self, char *key) {
+  khiter_t k = kh_get(value, self, key);
+  kh_del(value, self, k);
 }

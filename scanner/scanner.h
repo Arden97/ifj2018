@@ -10,8 +10,8 @@
 #ifndef IFJ18_TOKEN_H
 #define IFJ18_TOKEN_H
 
-#include "error.h"
-#include "strlib.h"
+#include "../error/error.h"
+#include "../utils/strlib.h"
 #include <assert.h>
 #include <ctype.h>
 #include <math.h>

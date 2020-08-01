@@ -10,6 +10,13 @@
 #ifndef STACK_H
 #define STACK_H
 
+#include "../error/error.h"
+#include "prettyprint.h"
+#include "../scanner/scanner.h"
+#include "../semantics/semantics.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 typedef struct stack_elem_t {
   void *data;                    ///< pointer to stack data
   struct stack_elem_t *next_ptr; ///< pointer to next item

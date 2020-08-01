@@ -2,28 +2,27 @@
 // School:      Brno University of Technology, Faculty of Information Technology //
 // Course:      Formal Languages and Compilers                                   //
 // Project:     IFJ18                                                            //
-// Module:      Header file of garbage collector 	                               //
+// Module:      List implementation	                                             //
 // Authors:     Artem Denisov       (xdenis00)                                   //
 //              Volodymyr Piskun    (xpisku03)                                   //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef ifj_GC
-
-#define ifj_GC
-
 #include "list.h"
-#include <stddef.h>
+#include <stdlib.h>
 
-tList *garbage_list;
+void *copy_last(tList *L) {
 
-void *find(void *ptr);
-void *gc_malloc(size_t size);
-void *gc_realloc(void *ptr, size_t size);
-void gc_free(void *ptr);
-void gc_dispose();
+  if (L->Last != NULL) {
+    return L->Last->val;
+  } else {
+    return NULL;
+  }
+}
 
-void gc_delete(void *element);
-void gc_append(void *val);
-void gc_pop();
+void init_list(tList *L) {
+  L->First = NULL;
+  L->Last = NULL;
+  L->Active = NULL;
+}
 
-#endif
+void print_list(tList *L) {}
