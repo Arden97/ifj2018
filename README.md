@@ -1,1 +1,1 @@
-# Implementation of a compiler for imperative language IFJ18 [![Build Status](https://travis-ci.com/alexander-demichev/ifj2018.svg?token=nipGaejzkQCRqBNSNuhp&branch=master)](https://travis-ci.com/alexander-demichev/ifj2018)
+# Compiler for imperative language IFJ18
