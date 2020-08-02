@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/// String structure
 typedef struct {
   int length;
   int mem_alloc;

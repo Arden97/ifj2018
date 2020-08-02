@@ -18,12 +18,12 @@
 #include <stdlib.h>
 
 typedef struct stack_elem_t {
-  void *data;                    ///< pointer to stack data
-  struct stack_elem_t *next_ptr; ///< pointer to next item
+  void *data;
+  struct stack_elem_t *next_ptr;
 } stack_elem_t;
 
 typedef struct ifj18_stack_t {
-  stack_elem_t *top_ptr; ///< pointer to the stack top
+  stack_elem_t *top_ptr;
 } ifj18_stack_t;
 
 ifj18_stack_t *stack_init();
@@ -34,4 +34,5 @@ int stack_empty(ifj18_stack_t *s);
 void stack_print(ifj18_stack_t *s);
 void stack_copy(ifj18_stack_t *dst_stack, ifj18_stack_t *src_stack);
 void stack_print_objects(ifj18_stack_t *s);
-#endif // STACK_Hifj18_
+
+#endif

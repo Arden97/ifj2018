@@ -17,18 +17,16 @@ void init_token() {
   string_init(token->value->as_string);
 }
 
-// function to save read token to token structure
+const char *ifj18_token_type_string(ifj18_token type) {
+  assert(type <= TOKEN_CHR);
+  return ifj18_token_strings[type];
+}
+
 ifj18_token_t *save_token(ifj18_token type) {
   token->type = type; // assign the type
   token->len = token->value->as_string->length;
-
   return token;
 }
-
-/*
- * Convert hex digit `c` to a base 10 int,
- * returning -1 on failure.
- */
 
 static int hex(int c) {
   if (c >= '0' && c <= '9')
@@ -39,11 +37,6 @@ static int hex(int c) {
     return c - 'A' + 10;
   return -1;
 }
-
-
-/*
- * Scan identifier.
- */
 
 static ifj18_token_t *scan_ident(int c) {
   int len = 0;
@@ -87,21 +80,12 @@ static ifj18_token_t *scan_ident(int c) {
   return save_token(TOKEN_ID);
 }
 
-/*
- * Scan string hex literal, returning -1 on invalid digits.
- */
-
 static int hex_literal() {
   int a = hex(fgetc(stdin));
   int b = hex(fgetc(stdin));
   if (a > -1 && b > -1) return a << 4 | b;
   error(LEXICAL_ERROR, "string hex literal \\x contains invalid digits");
 }
-
-
-/*
- * Scan string.
- */
 
 static ifj18_token_t *scan_string() {
   int c, len = 0;
@@ -194,10 +178,6 @@ static ifj18_token_t *scan_string() {
   string_copy_literal(token->value->as_string, buf);
   return save_token(TOKEN_STRING);
 }
-
-/*
- * Scan number.
- */
 
 static ifj18_token_t *scan_number(int c) {
   int n = 0, type = 0, expo = 0, e = 0;
@@ -468,5 +448,4 @@ void check_token_type_msg(int required_type, int error_type, int inv, char *mess
       error(error_type, message);
     }
   }
-//  printf("end of check_token\n");
 }

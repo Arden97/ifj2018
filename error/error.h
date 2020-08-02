@@ -8,12 +8,12 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #ifndef ifj_error
+#define ifj_error
 
 #include "../utils/utils.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define ifj_error
 
 #define LEXICAL_ERROR 1
 #define SYNTAX_ERROR 2

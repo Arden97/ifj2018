@@ -319,7 +319,6 @@ void psa_operation(ifj18_stack_t *operators_stack, ifj18_stack_t *output_stack, 
             stack_token = stack_top(operators_stack);
         }
         stack_token = token;
-        // printf("in to oper stack2 %s\n", stack_token->value->as_string->value);
         stack_push(operators_stack, stack_token);
     }
 }

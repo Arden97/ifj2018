@@ -48,51 +48,29 @@ typedef struct ifj18_obj_t {
 
 KHASH_MAP_INIT_STR(value, ifj18_obj_t *);
 
-/*
- * IFJ18 hash.
- */
-
+/// IFJ18 hash.
 typedef khash_t(value) ifj18_hash_t;
 
-/*
- * Allocate a new hash.
- */
-
+/// Allocate a new hash.
 #define ifj18_hash_new() kh_init(value)
 
-/*
- * Destroy the hash.
- */
-
+///Destroy the hash.
 #define ifj18_hash_destroy(self) kh_destroy(value, self)
 
-/*
- * Hash size.
- */
-
+/// Hash size.
 #define ifj18_hash_size kh_size
 
-/*
- * Save the object with by "key" in symbol table
- */
+/// Save the object with by "key" in symbol table
 void ifj18_hash_set(khash_t(value) * self, char *key, ifj18_obj_t *val);
 
-/*
- * Get the object with by "key" from symbol table
- */
+/// Get the object with by "key" from symbol table
 ifj18_obj_t *ifj18_hash_get(khash_t(value) * self, char *key);
 
-/*
- * Returns true if there is an object with "key" in symbol table
- */
+/// Returns true if there is an object with "key" in symbol table
 int ifj18_hash_has(khash_t(value) * self, char *key);
 
-/*
- * Removes `key` from symbol table
- */
+/// Removes `key` from symbol table
 void ifj18_hash_remove(khash_t(value) * self, char *key);
-
-char called_functions[50][50];
 
 /// Creates a variable object
 ifj18_obj_t *init_var();
@@ -100,6 +78,7 @@ ifj18_obj_t *init_var();
 /// Creates a function object
 ifj18_obj_t *init_func();
 
+/// Global hash table
 struct ifj18_hash_t *global_table;
 
 #endif

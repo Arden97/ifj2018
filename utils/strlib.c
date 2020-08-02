@@ -11,15 +11,14 @@
 
 int string_init(string *str) {
   if ((str->value = (char *)malloc(8)) == NULL) {
+    error(INTERNAL_ERROR, "Initial string allocation failed");
   }
-  // exit_error("Allocation failed.", INTERNAL_ERR);
   str->value[0] = str->length = 0;
   return 1;
 }
 
 void string_free(string *str) {
   free(str->value);
-  //    free(str);
 }
 
 void string_reset(string *str) {
@@ -30,7 +29,7 @@ void string_reset(string *str) {
 int string_append(string *str, char sym) {
   if (str->length + 1 >= str->mem_alloc) {
     if ((str->value = (char *)realloc(str->value, str->length + sizeof(char))) == NULL) {
-      // exit_error("Allocation failed.", INTERNAL_ERR);
+      error(INTERNAL_ERROR, "String reallocation failed");
     }
     str->mem_alloc = str->length + sizeof(char);
   }
@@ -41,9 +40,13 @@ int string_append(string *str, char sym) {
   return 1;
 }
 
-int string_compare(string *str1, string *str2) { return strcmp(str1->value, str2->value); }
+int string_compare(string *str1, string *str2){
+  return strcmp(str1->value, str2->value);
+}
 
-int string_compare_literal(string *str1, char *str2) { return strcmp(str1->value, str2); }
+int string_compare_literal(string *str1, char *str2) {
+  return strcmp(str1->value, str2);
+}
 
 int string_in_list(string *substr, char **strings, int strings_length) {
   for (int i = 0; i < strings_length; ++i) {
@@ -57,7 +60,7 @@ int string_in_list(string *substr, char **strings, int strings_length) {
 int string_copy(string *str1, string *str2) {
   if (str1->mem_alloc <= str2->length) {
     if ((str1->value = (char *)realloc(str1->value, str2->length + 1)) == NULL) {
-      // exit(INTERNAL_ERR);
+      error(INTERNAL_ERROR, "String reallocation failed");
     }
     str1->mem_alloc = str2->length + 1;
   }
