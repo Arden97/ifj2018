@@ -9,14 +9,20 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "gc/gc.h"
+// #include "gc/gc.h"
 #include "parser/parser.h"
 
+/// Global active token
+ifj18_token_t *token;
+
+/// Global hash table
+struct ifj18_hash_t *global_table;
+
 int main() {
-  if ((garbage_list = malloc(sizeof(tList))) == NULL) {
-    error(INTERNAL_ERROR, "can't allocate memory for garbage colector");
-  }
-  init_list(garbage_list);
+  // if ((garbage_list = malloc(sizeof(tList))) == NULL) {
+  //   error(INTERNAL_ERROR, "can't allocate memory for garbage colector");
+  // }
+  // init_list(garbage_list);
 
   global_table = ifj18_hash_new();
 

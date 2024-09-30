@@ -79,6 +79,6 @@ ifj18_obj_t *init_var();
 ifj18_obj_t *init_func();
 
 /// Global hash table
-struct ifj18_hash_t *global_table;
+extern struct ifj18_hash_t *global_table;
 
 #endif

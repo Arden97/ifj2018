@@ -57,7 +57,7 @@ typedef struct {
 } ifj18_token_t;
 
 /// Global active token
-ifj18_token_t *token;
+extern ifj18_token_t *token;
 
 /// Token initialization
 void init_token();
