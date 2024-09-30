@@ -66,6 +66,9 @@ int main() {
   printf("JUMP MAIN\n\n");
 
   // Generating code for built-in functions
+
+  // Excepts int and returns char from ASCII table
+  // arg1: given int
   printf(
       "LABEL chr\n"
       "PUSHFRAME\n"
@@ -77,6 +80,8 @@ int main() {
       "RETURN\n\n"
   );
 
+  // Return string length
+  // arg1: given string
   printf(
       "LABEL length\n"
       "PUSHFRAME\n"
@@ -88,6 +93,10 @@ int main() {
       "RETURN\n\n"
   );
 
+  // Returns substring of a given string
+  // arg1: given string
+  // arg2: index of of the substring beginning
+  // arg3: length of the string
   printf(
       "LABEL substr\n"
       "PUSHFRAME\n"
@@ -142,6 +151,9 @@ int main() {
       "RETURN\n\n"
   );
 
+  // Return ASCII value of a character in a string
+  // arg1: given string
+  // arg2: int index
   printf(
       "LABEL ord\n"
       "PUSHFRAME\n"
